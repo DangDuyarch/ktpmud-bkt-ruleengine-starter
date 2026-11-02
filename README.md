@@ -6,11 +6,12 @@ giai mau — sinh vien fork repo nay va hien thuc `rule_engine/classifier.py`.
 
 ## Boi canh
 
-Dac ta day du (bang phan loai WAO/EAACI, Data Dictionary, Acceptance
-Criteria) nam o `do_an_mon_hoc.md` cua KTPMUD, Muc 2 va 4.1:
-https://fossbk-spec.github.io/ktpmud-book/do_an_mon_hoc
+**Dac ta chinh thuc (Data Dictionary + bang quyet dinh V1) nam o
+[`docs/decision-table.md`](docs/decision-table.md) trong chinh repo nay.**
+`do_an_mon_hoc.md` cua KTPMUD chi yeu cau tuan thu chuan WAO/EAACI, khong co
+bang chi tiet - dung dung `docs/decision-table.md` lam nguon duy nhat.
 
-**Khong tu suy dien nguong/quy tac lam sang moi chua duoc GV xac nhan.**
+**Khong tu suy dien nguong/quy tac lam sang moi ngoai `docs/decision-table.md`.**
 
 ## Cach chay
 

@@ -1,29 +1,36 @@
 """Rule Engine WAO/EAACI - khung bai tap BKT-1 (Track A), mon KTPMUD.
 
-Sinh vien hien thuc ham classify() theo dac ta WAO/EAACI da co san trong
-do_an_mon_hoc.md (Muc 2 va 4.1, xem https://fossbk-spec.github.io/ktpmud-book/do_an_mon_hoc).
-KHONG tu dat nguong/quy tac moi chua duoc GV xac nhan.
+Sinh vien hien thuc ham classify() theo dac ta trong docs/decision-table.md.
+KHONG tu dat nguong/quy tac moi chua co trong dac ta.
 """
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 
-class PatientInput(TypedDict):
-    """Input mau - cau truc that lay dung theo Data Dictionary cua de bai (se cap nhat khi cong bo de)."""
-    uas7_score: int
-    has_angioedema: bool
-    duration_weeks: int
+class PatientInput(TypedDict, total=False):
+    """Input theo dung Data Dictionary trong docs/decision-table.md."""
+    tuoi: float
+    huyet_ap_tam_thu: Optional[int]
+    huyet_ap_tam_thu_nen: Optional[int]
+    co_di_nguyen_nghi_ngo: bool
+    di_nguyen_qua_duong_hit: bool
+    co_ton_thuong_da_niem_mac: bool
+    co_trieu_chung_ho_hap: bool
+    co_trieu_chung_tuan_hoan: bool
+    co_trieu_chung_tieu_hoa_nang: bool
 
 
 class ClassificationResult(TypedDict):
-    risk_level: str  # vi du: "LOW" | "MEDIUM" | "HIGH" - dung dung nhan theo bang WAO/EAACI
-    reason: str
+    muc_do: str  # "SOC_PHAN_VE" | "PHAN_VE" | "THEO_DOI" - dung dung nhan theo docs/decision-table.md
+    rule_id: Optional[str]  # "R-SOC" | "R01-PV" | "R02-PV" | "R03-PV" | None
+    ly_do: str
 
 
 def classify(patient: PatientInput) -> ClassificationResult:
-    """Phan loai muc nguy co theo bang WAO/EAACI.
+    """Phan loai muc do theo docs/decision-table.md.
 
-    TODO (sinh vien): hien thuc dung logic theo do_an_mon_hoc.md Muc 2/4.1.
+    TODO (sinh vien): hien thuc dung logic theo Tang 1 (Soc phan ve) va
+    Tang 2 (Phan ve, 3 kich ban R01/R02/R03) trong dac ta.
     """
-    raise NotImplementedError("Sinh vien hien thuc ham nay theo dac ta WAO/EAACI")
+    raise NotImplementedError("Sinh vien hien thuc ham nay theo docs/decision-table.md")
