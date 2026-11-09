@@ -1,10 +1,10 @@
-"""Bộ Unit Test đầy đủ cho rule_engine/classifier.py."""
+"""Test đầy đủ cho rule_engine/classifier.py."""
 
 import pytest
 from rule_engine.classifier import classify
 
 
-# --- 1. TEST TẦNG 2: R01, R02, R03 ---
+# 1. TEST TẦNG 2: R01, R02, R03
 
 def test_r01_success():
     """R01: Không dị nguyên + Da niêm mạc + Hô hấp."""
@@ -63,7 +63,7 @@ def test_rule_conflict_r02_and_r03():
     assert res["rule_id"] == "R02-PV"
 
 
-# --- 2. TEST TẦNG 1: R-SOC VÀ KIỂM THỬ BIÊN ---
+# 2. TEST TẦNG 1: R-SOC VÀ KIỂM THỬ BIÊN
 
 @pytest.mark.parametrize(
     "tuoi, hatt, hatt_nen, expected_muc_do, expected_rule",
@@ -72,9 +72,9 @@ def test_rule_conflict_r02_and_r03():
         (0.5, 69, None, "SOC_PHAN_VE", "R-SOC"),
         (0.5, 70, None, "PHAN_VE", "R01-PV"),
         # Tuổi 1 đến <11 (Ngưỡng 70 + 2*tuoi)
-        (1.0, 71, None, "SOC_PHAN_VE", "R-SOC"),
+        (1.0, 71, None, "SOC_PHAN_VE", "R-SOC"),   # Ngưỡng 72
         (1.0, 72, None, "PHAN_VE", "R01-PV"),
-        (5.0, 79, None, "SOC_PHAN_VE", "R-SOC"),
+        (5.0, 79, None, "SOC_PHAN_VE", "R-SOC"),   # Ngưỡng 80
         (5.0, 80, None, "PHAN_VE", "R01-PV"),
         # Tuổi 11 đến <18 (Ngưỡng 90)
         (11.0, 89, None, "SOC_PHAN_VE", "R-SOC"),
@@ -82,9 +82,9 @@ def test_rule_conflict_r02_and_r03():
         # Tuổi >= 18 (HATT < 90)
         (18.0, 89, None, "SOC_PHAN_VE", "R-SOC"),
         (18.0, 90, None, "PHAN_VE", "R01-PV"),
-        # Tuổi >= 18 (Xét mức giảm % so với nền)
-        (30.0, 84, 120, "PHAN_VE", "R01-PV"),
-        (30.0, 83, 120, "SOC_PHAN_VE", "R-SOC"),
+        # Tuổi >= 18 (SỬA LỖI 2: Dùng HATT nền 140 để tránh vướng điều kiện HATT < 90)
+        (30.0, 98, 140, "PHAN_VE", "R01-PV"),      # Giảm đúng 30.0% ((140-98)/140 = 0.3) -> PHAN_VE
+        (30.0, 97, 140, "SOC_PHAN_VE", "R-SOC"),   # Giảm 30.71% (> 30%) -> SOC_PHAN_VE
     ],
 )
 def test_soc_boundaries(tuoi, hatt, hatt_nen, expected_muc_do, expected_rule):
@@ -102,7 +102,7 @@ def test_soc_boundaries(tuoi, hatt, hatt_nen, expected_muc_do, expected_rule):
     assert res["rule_id"] == expected_rule
 
 
-# --- 3. TEST DỮ LIỆU THIẾU VÀ TRƯỜNG HỢP KHÔNG KHỚP ---
+# 3. TEST DỮ LIỆU THIẾU VÀ TRƯỜNG HỢP KHÔNG KHỚP
 
 def test_missing_tuoi():
     """Thiếu trường tuổi -> THEO_DOI."""

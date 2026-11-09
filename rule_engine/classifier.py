@@ -74,7 +74,7 @@ def _is_soc(patient: PatientInput) -> bool:
     if hatt is None:
         return False
 
-    # Ngưỡng theo nhóm tuổi
+    # Ngưỡng tụt huyết áp theo nhóm tuổi
     if 0 <= tuoi < 1:
         return hatt < 70
     elif 1 <= tuoi < 11:
@@ -86,13 +86,22 @@ def _is_soc(patient: PatientInput) -> bool:
             return True
         hatt_nen = patient.get("huyet_ap_tam_thu_nen")
         if hatt_nen is not None and hatt_nen > 0:
-            # Điều kiện: giảm > 30% so với HATT nền
+            # Điều kiện: giảm > 30% so với HATT nền (strict > 30%)
             return (hatt_nen - hatt) / hatt_nen > 0.30
         return False
 
 
 def classify(patient: PatientInput) -> ClassificationResult:
     """Phân loại mức độ phản vệ theo bảng quyết định WAO/EAACI."""
+    # SỬA LỖI 1: Theo đặc tả, thiếu tuoi -> THEO_DOI ngay lập tức
+    tuoi = patient.get("tuoi")
+    if tuoi is None or tuoi < 0:
+        return {
+            "muc_do": "THEO_DOI",
+            "rule_id": None,
+            "ly_do": "Thieu thong tin tuoi hop le cua benh nhan.",
+        }
+
     # 1. Kiểm tra Tầng 2 (Các kịch bản Phản vệ) theo thứ tự ưu tiên R01 -> R02 -> R03
     matched_rule: Optional[str] = None
     if _check_r01(patient):
