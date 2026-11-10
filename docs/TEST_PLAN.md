@@ -1,144 +1,217 @@
-# TEST_PLAN.md — Kế hoạch kiểm thử Rule Engine
+# KẾ HOẠCH KIỂM THỬ — TEST_PLAN
 
 ## 1. Thông tin chung
 
-- **Dự án:** Rule Engine WAO/EAACI — bài tập KTPMUD, Track A.
-- **Phạm vi phụ trách:** QA, kiểm thử và rà soát bảo mật/quyền riêng tư.
-- **Hàm trọng tâm:** `classify()`.
-- **Đặc tả đối chiếu:** `docs/decision-table.md`.
-- **Mã kiểm thử QA:** `tests/test_classifier_qa.py`.
-- **Mã kiểm thử sẵn có của dự án:** `tests/test_classifier.py`.
-- **Tài liệu liên quan:** `docs/AC_TRACEABILITY.md`, `docs/SECURITY_PRIVACY_CHECKLIST.md`.
+| Thuộc tính              | Nội dung                                                  |
 
-Tài liệu này mô tả phạm vi, phương pháp, tiêu chí và cách ghi nhận kiểm thử. Kết quả trong tài liệu chỉ phản ánh những lần chạy đã ghi nhận; không mặc định rằng mọi yêu cầu đều đã được xác minh.
+| Dự án                   | KTPMUD Hack Marathon 2026                                 |
+| Track                   | Track A — Dr May Day: Rule Engine Sprint                  |
+| Nhóm                    | 26                                                        |
+|                         |                                                           |
+| Nguồn quy tắc nghiệp vụ | `docs/decision-table.md`                                  |
+| Tag quy tắc             | `bkt-2026-v1`                                             |
+| Mã nguồn cần kiểm thử   | Module triển khai hàm `classify()`                        |
+| Bộ kiểm thử             | `tests/test_classifier.py`, `tests/test_classifier_qa.py` |
+| Công cụ                 | Python, pytest                                            |
+| Kết quả gần nhất        | 79 passed, 0 failed, 0.27 giây                            |
+| Cảnh báo bắt buộc       | `educational/synthetic — not for clinical use`            |
 
-## 2. Mục tiêu
+## 2. Mục tiêu kiểm thử
 
-1. Kiểm tra kết quả của `classify()` theo các quy tắc và thứ tự ưu tiên được mô tả trong đặc tả.
-2. Kiểm tra những trường hợp biên có thể làm thay đổi kết quả, đặc biệt là dữ liệu tuổi và điều kiện huyết áp.
-3. Kiểm tra cách xử lý đầu vào thiếu, `None`, sai kiểu hoặc ngoài miền hợp lệ theo hợp đồng đầu vào.
-4. Kiểm tra tính ổn định của cấu trúc đầu ra và tránh làm thay đổi dữ liệu đầu vào của bên gọi, trong phạm vi có test tương ứng.
-5. Ghi nhận riêng các yêu cầu về audit, log, quyền riêng tư và hiệu năng để không kết luận đạt khi chưa có bằng chứng phù hợp.
+Kế hoạch kiểm thử nhằm xác minh hệ thống Rule Engine có đáp ứng yêu cầu về logic phân loại, kiểm tra dữ liệu đầu vào, cấu trúc đầu ra, quyền riêng tư, audit và khả năng chạy tự động hay không.
+
+Các mục tiêu chính:
+
+- Kiểm tra kết quả phân loại theo đúng bảng quyết định nghiệp vụ.
+- Kiểm tra thứ tự ưu tiên giữa các quy tắc và những trường hợp biên.
+- Kiểm tra dữ liệu thiếu, UNKNOWN, sai kiểu, sai miền giá trị và khóa không được phép.
+- Kiểm tra cấu trúc kết quả và nội dung giải thích.
+- Kiểm tra audit trail, khả năng xử lý lỗi audit và việc bảo vệ dữ liệu.
+- Kiểm tra khả năng chạy bộ test trong môi trường sạch và trên CI.
+- Kiểm tra benchmark hiệu năng và nội dung hướng dẫn trong README.
+
+**Nguyên tắc:** Chỉ kết luận một tiêu chí đã đạt khi có bằng chứng phù hợp. Việc pytest chạy thành công không đồng nghĩa tất cả yêu cầu nghiệm thu đều đã được xác minh.
 
 ## 3. Phạm vi kiểm thử
 
 ### 3.1. Trong phạm vi
 
-- Kết quả phân loại theo các nhánh quy tắc trong `docs/decision-table.md`.
-- Thứ tự ưu tiên khi nhiều quy tắc cùng có thể khớp.
-- Các trường hợp thiếu dữ liệu tuổi và thứ tự xử lý xác thực dữ liệu.
-- Điều kiện huyết áp, bao gồm ranh giới giảm huyết áp tương đối 30% đã được nhóm kiểm tra.
-- Một số đầu vào sai kiểu, giá trị âm hoặc giá trị không hợp lệ được đưa vào bộ test.
-- Kiểm tra hồi quy bằng cách chạy toàn bộ test tự động.
-- Rà soát mã và tài liệu liên quan đến an toàn dữ liệu, audit và quyền riêng tư; các nội dung này được đánh dấu theo bằng chứng thực tế.
+1. Logic phân loại R01-PV, R02-PV, R03-PV và R-SOC.
+2. Thứ tự ưu tiên của quy tắc và các điều kiện biên.
+3. Xử lý dữ liệu đầu vào thiếu hoặc không hợp lệ.
+4. Kiểm tra kiểu dữ liệu, miền giá trị và danh sách khóa cho phép.
+5. Cấu trúc đầu ra gồm đúng ba khóa `muc_do`, `rule_id`, `ly_do`.
+6. Tính xác định của kết quả và việc không đưa dữ liệu đầu vào cụ thể vào `ly_do`.
+7. Audit trail và các tình huống lỗi liên quan.
+8. Kiểm tra quyền riêng tư, cấu hình lưu log và repository.
+9. Chạy test tự động, CI, benchmark và kiểm tra README.
 
-### 3.2. Ngoài phạm vi hoặc chưa đủ bằng chứng
+### 3.2. Ngoài phạm vi
 
-- Chưa khẳng định toàn bộ hệ thống đáp ứng mọi yêu cầu chỉ từ kết quả test của hàm `classify()`.
-- Chưa coi việc test hàm đơn lẻ là bằng chứng audit trail được ghi đầy đủ trong luồng chạy thực tế.
-- Chưa xác nhận đầy đủ việc loại bỏ dữ liệu nhạy cảm khỏi log ở mọi đường đi xử lý.
-- Chưa có benchmark toàn hệ thống có I/O thực tế được xác nhận trong phạm vi kết quả đang ghi nhận.
-- Chưa khẳng định kiểm thử CI từ clean checkout đạt nếu chưa có kết quả chạy tương ứng.
+- Sử dụng dữ liệu bệnh nhân thật.
+- Đánh giá hiệu quả chẩn đoán hoặc điều trị ngoài đời thực.
+- Đưa ra khuyến nghị điều trị cho người sử dụng.
+- Khẳng định hệ thống đủ điều kiện sử dụng lâm sàng.
 
-## 4. Môi trường và cách chạy
+Hệ thống chỉ phục vụ mục đích giáo dục và thử nghiệm với dữ liệu tổng hợp.
 
-- **Ngôn ngữ:** Python.
-- **Framework:** `pytest`.
-- **Lệnh chạy toàn bộ test:**
+## 4. Môi trường và cách chạy kiểm thử
 
-```bash
-python -m pytest -q
-```
+### 4.1. Môi trường đã ghi nhận
 
-Chạy lệnh từ thư mục gốc repository. Khi kiểm thử trên máy mới hoặc môi trường CI, cần cài các phụ thuộc theo hướng dẫn của repository trước khi chạy.
+| Thành phần   | Thông tin |
+| ------------ | --------- |
+| Hệ điều hành | Windows   |
+| Python       | 3.15.1    |
+| pytest       | 9.2.0     |
+| Tổng số test | 79        |
+| Kết quả      | 79 passed |
+| Thời gian    | 0.27 giây |
 
-### Quy trình chạy
+Thông tin trên được lấy từ output kiểm thử đã ghi nhận. Cần cập nhật nếu môi trường hoặc phiên bản mã nguồn thay đổi.
 
-1. Đồng bộ nhánh với phiên bản code cần kiểm thử.
-2. Kiểm tra `git status` để xác định các thay đổi đang có.
-3. Chạy `python -m pytest -q`.
-4. Ghi lại lệnh, kết quả, commit/phiên bản được kiểm thử và lỗi nếu có.
-5. Nếu test thất bại, lưu thông tin lỗi, phân loại nguyên nhân và chạy lại sau khi sửa.
-6. Chỉ cập nhật trạng thái tài liệu theo kết quả mới nhất đã quan sát được.
+### 4.2. Lệnh kiểm thử
 
-## 5. Ma trận nhóm kiểm thử
-
-| Mã nhóm | Nhóm kiểm thử         | Nội dung                                                                                 | Kết quả mong đợi                                                                                    | Bằng chứng                                                                          |
-| ------- | --------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| TP-01   | Quy tắc phân loại     | Các đầu vào đại diện cho những nhánh được mô tả trong decision table                     | Nhãn phân loại và mã quy tắc khớp đặc tả                                                            | `tests/test_classifier.py`, `tests/test_classifier_qa.py`, `docs/decision-table.md` |
-| TP-02   | Thứ tự ưu tiên        | Đầu vào có nhiều điều kiện/quy tắc cùng khớp                                             | Chọn kết quả theo thứ tự ưu tiên đã quy định; không tự thêm quy tắc                                 | Test tương ứng và decision table                                                    |
-| TP-03   | Thiếu dữ liệu tuổi    | Tuổi bị thiếu hoặc không có giá trị trong những trường hợp được kiểm tra                 | Xử lý đúng theo đặc tả và đúng thứ tự xác thực; không đưa ra kết luận vượt quá dữ liệu              | Test QA liên quan và kết quả chạy                                                   |
-| TP-04   | Ranh giới huyết áp    | Giá trị ở dưới, đúng bằng và ở trên ngưỡng; trường hợp giảm tương đối 30%                | Kết quả ở mỗi phía ngưỡng khớp quy ước của đặc tả                                                   | Test biên trong bộ test                                                             |
-| TP-05   | Kiểu dữ liệu          | Dữ liệu số/boolean/chuỗi không đúng kiểu theo hợp đồng đầu vào                           | Được chấp nhận hoặc từ chối đúng như đặc tả; không âm thầm diễn giải sai kiểu                       | Test đầu vào không hợp lệ                                                           |
-| TP-06   | Miền giá trị          | Giá trị âm hoặc giá trị ngoài miền hợp lệ đã được quy định                               | Phản hồi đúng theo hợp đồng; không phát sinh kết quả phân loại sai                                  | Test xác thực dữ liệu                                                               |
-| TP-07   | Cấu trúc đầu ra       | Các trường hợp đầu ra có nhãn, mã quy tắc và lý do                                       | Cấu trúc và giá trị đầu ra đúng hợp đồng đã được đặc tả                                             | Assertion trong test và rà soát code                                                |
-| TP-08   | Tính toàn vẹn đầu vào | Kiểm tra dữ liệu đầu vào có bị hàm sửa ngoài ý muốn hay không, nếu có test tương ứng     | Dữ liệu của bên gọi không bị thay đổi ngoài hợp đồng                                                | Test tương ứng hoặc kiểm tra mã                                                     |
-| TP-09   | Hồi quy               | Chạy lại toàn bộ test sau khi cập nhật code hoặc test                                    | Test hiện có tiếp tục đạt; lỗi đã sửa không xuất hiện lại                                           | Kết quả `pytest` mới nhất                                                           |
-| TP-10   | Audit trail           | Kiểm tra việc ghi nhận hành động, thời điểm, định danh và trạng thái trong luồng thực tế | Chỉ đánh dấu đạt khi có test/bằng chứng audit thực tế; test hàm phân loại đơn lẻ không đủ           | Mã triển khai, test audit và log thử nghiệm nếu có                                  |
-| TP-11   | Log và quyền riêng tư | Rà soát việc không ghi dữ liệu nhạy cảm không cần thiết và cách xử lý lỗi                | Chỉ đánh dấu đạt với bằng chứng phù hợp; nếu mới đọc một phần mã thì ghi rõ phạm vi                 | `docs/SECURITY_PRIVACY_CHECKLIST.md`, mã và test liên quan                          |
-| TP-12   | Hiệu năng             | Đo thời gian xử lý theo phương pháp có thể lặp lại                                       | Phân biệt benchmark hàm đơn lẻ với hiệu năng toàn hệ thống; không kết luận khi chưa đo đúng phạm vi | Script, cấu hình và kết quả benchmark nếu có                                        |
-| TP-13   | Môi trường sạch/CI    | Cài đặt phụ thuộc và chạy test từ checkout sạch hoặc CI                                  | Quy trình tái lập được và test đạt trên môi trường mục tiêu                                         | Workflow CI và log chạy thực tế                                                     |
-
-**Lưu ý:** Ma trận là kế hoạch kiểm thử. Việc liệt kê một nhóm không có nghĩa nhóm đó đã được thực thi hoặc đã đạt. Với các mục không có test/bằng chứng tương ứng, trạng thái phải là **Chưa xác minh**.
-
-## 6. Một số tình huống kiểm thử tiêu biểu
-
-| Mã    | Tình huống                                | Cách kiểm tra                                                     | Kỳ vọng                                                             |
-| ----- | ----------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-| TC-01 | Đầu vào đủ dữ liệu cho một nhánh quy tắc  | Gọi `classify()` với fixture hợp lệ đã được xác định trong đặc tả | Nhãn và mã quy tắc đúng với decision table                          |
-| TC-02 | Nhiều nhánh quy tắc cùng khớp             | Dùng fixture thể hiện điều kiện chồng lấn                         | Kết quả tuân theo thứ tự ưu tiên                                    |
-| TC-03 | Thiếu tuổi                                | Thử trường hợp thiếu tuổi theo test đã định nghĩa                 | Xử lý đúng theo đặc tả; không bỏ qua quy tắc xác thực tuổi          |
-| TC-04 | Huyết áp nằm ngay dưới ngưỡng             | Dùng dữ liệu biên trong bộ test                                   | Kết quả phù hợp với quy tắc ngưỡng                                  |
-| TC-05 | Huyết áp đúng bằng ngưỡng                 | Dùng dữ liệu đúng tại ranh giới                                   | Kết quả khớp quy ước so sánh trong đặc tả                           |
-| TC-06 | Huyết áp ngay trên ngưỡng                 | Dùng dữ liệu biên trong bộ test                                   | Kết quả phù hợp với quy tắc ngưỡng                                  |
-| TC-07 | Giảm huyết áp tương đối tại ranh giới 30% | Đối chiếu các trường hợp hai phía ranh giới đã có trong test      | Không lệch do phép so sánh `<`, `<=` hoặc tính toán ngưỡng          |
-| TC-08 | Đầu vào sai kiểu                          | Dùng giá trị sai kiểu đã được định nghĩa trong test               | Xử lý theo hợp đồng; không tự chuyển kiểu nếu đặc tả không cho phép |
-| TC-09 | Đầu vào có giá trị không hợp lệ           | Dùng giá trị ngoài miền đã được định nghĩa trong test             | Từ chối hoặc xử lý theo hợp đồng đầu vào                            |
-| TC-10 | Chạy hồi quy toàn bộ                      | Chạy `python -m pytest -q`                                        | Ghi lại tổng số test pass/fail và lỗi chi tiết nếu có               |
-
-Các tình huống trên là mô tả mức kế hoạch, không thay thế input/expected cụ thể trong mã test. Trước khi bàn giao, cần đối chiếu từng tình huống với assertion thực tế để tránh ghi nhận một test chưa tồn tại.
-
-## 7. Tiêu chí đạt/không đạt
-
-- **Đạt:** test đã thực thi và kết quả thực tế khớp expected; có thể chỉ ra bằng chứng tương ứng.
-- **Không đạt:** test đã thực thi nhưng kết quả khác expected, hoặc phát hiện lỗi.
-- **Chưa xác minh:** chưa có test, chưa chạy test, hoặc bằng chứng chưa đủ để kết luận.
-- **Không áp dụng:** yêu cầu không thuộc phạm vi phiên bản đang kiểm thử; cần nêu rõ lý do.
-
-Không chuyển một mục sang “Đạt” chỉ vì toàn bộ pytest thành công. Ví dụ, test của `classify()` không tự chứng minh audit trail, bảo mật log, quyền riêng tư toàn hệ thống hoặc hiệu năng có I/O.
-
-## 8. Kết quả thực thi đã ghi nhận
-
-Trong lần chạy trước được ghi nhận trong quá trình làm việc, lệnh:
+Chạy toàn bộ bộ test:
 
 ```bash
-python -m pytest -q
+python -m pytest -v
 ```
 
-cho kết quả:
+Chạy riêng từng file:
+
+```bash
+python -m pytest -v tests/test_classifier.py
+python -m pytest -v tests/test_classifier_qa.py
+```
+
+Kiểm tra định dạng thay đổi trước khi commit:
+
+```bash
+git diff --check
+git status
+```
+
+Không chạy `git add .` khi chưa kiểm tra các file phát sinh, đặc biệt là thư mục audit.
+
+## 5. Các nhóm kiểm thử và tiêu chí
+
+| Nhóm  | Nội dung                  | Tiêu chí cần đạt                                                                      |
+| ----- | ------------------------- | ------------------------------------------------------------------------------------- |
+| TC-01 | Phân loại R01-PV          | Kết quả và `rule_id` đúng theo bảng quyết định                                        |
+| TC-02 | Phân loại R02-PV          | Điều kiện và mức độ phân loại đúng                                                    |
+| TC-03 | Phân loại R03-PV          | Điều kiện và mức độ phân loại đúng                                                    |
+| TC-04 | Quy tắc R-SOC             | Chỉ áp dụng khi đủ điều kiện Tier 2 và tiêu chí huyết áp                              |
+| TC-05 | Thứ tự ưu tiên            | Khi nhiều quy tắc cùng khớp, chọn đúng quy tắc ưu tiên                                |
+| TC-06 | Ngưỡng theo tuổi          | Xử lý đúng các ngưỡng tuổi và trường hợp biên                                         |
+| TC-07 | Giảm huyết áp ở người lớn | Phân biệt đúng mức giảm 30% và trên 30% theo yêu cầu                                  |
+| TC-08 | Dữ liệu thiếu             | Xử lý đúng trường thiếu, `None` và UNKNOWN                                            |
+| TC-09 | Sai kiểu dữ liệu          | Từ chối kiểu dữ liệu không hợp lệ, không ép kiểu ngầm                                 |
+| TC-10 | Sai miền giá trị          | Từ chối giá trị không hợp lệ theo hợp đồng                                            |
+| TC-11 | Khóa ngoài allowlist      | Từ chối khóa không nằm trong danh sách 9 khóa đầu vào                                 |
+| TC-12 | Thứ tự xác thực           | Kiểm tra toàn bộ trường được cung cấp trước khi suy luận                              |
+| TC-13 | Cấu trúc đầu ra           | Chỉ có `muc_do`, `rule_id`, `ly_do`                                                   |
+| TC-14 | Giải thích kết quả        | `ly_do` xác định, không chứa dữ liệu đầu vào cụ thể hoặc lời khuyên điều trị          |
+| TC-15 | Audit thành công          | Mỗi lần gọi có đúng một bản ghi với đúng bốn trường                                   |
+| TC-16 | Audit đầu vào lỗi         | Ghi `INVALID_INPUT` khi xác thực thất bại và audit hoạt động                          |
+| TC-17 | Audit thất bại            | Phát sinh `AuditError`, giữ lỗi gốc trong `__cause__` và không trả kết quả phân loại  |
+| TC-18 | Quyền riêng tư            | Không ghi dữ liệu bệnh nhân thô, PII hoặc bí mật vào audit                            |
+| TC-19 | CI                        | Bộ test tự động chạy thành công trên Pull Request                                     |
+| TC-20 | Benchmark                 | Có ít nhất 100 lượt warm-up, 1000 lượt đo, báo cáo p50/p95 và đáp ứng p95 dưới 100 ms |
+| TC-21 | README                    | Có hướng dẫn cài đặt, chạy, kiểm thử và cảnh báo bắt buộc chính xác                   |
+
+Các nhóm TC-01 đến TC-14 có bằng chứng kiểm thử trong output 79 test đã cung cấp, nhưng cần đối chiếu nội dung test với bảng quyết định để xác nhận phạm vi chính xác. Các nhóm TC-15 đến TC-21 cần bằng chứng riêng trước khi kết luận đạt.
+
+## 6. Kết quả kiểm thử đã ghi nhận
+
+Lần chạy gần nhất:
 
 ```text
-24 passed
+python -m pytest -v
+
+collected 79 items
+79 passed in 0.27s
 ```
 
-Đây là kết quả của lần chạy tại thời điểm đó, không phải cam kết rằng phiên bản hiện tại vẫn đạt. Cần chạy lại trên commit sẽ bàn giao và cập nhật kết quả chính xác, bao gồm số test thất bại nếu có.
+### 6.1. Các nội dung đã có bằng chứng kiểm thử
 
-| Hạng mục                                           | Trạng thái ghi nhận                      | Ghi chú                                       |
-| -------------------------------------------------- | ---------------------------------------- | --------------------------------------------- |
-| Bộ test tự động trong lần chạy đã ghi nhận         | 24 passed                                | Cần chạy lại trước khi bàn giao               |
-| Quy tắc phân loại và các trường hợp biên được test | Được kiểm tra trong phạm vi test hiện có | Đối chiếu lại với decision table              |
-| Audit trail thực tế                                | Chưa xác minh đầy đủ                     | Cần bằng chứng từ triển khai và test audit    |
-| Log và quyền riêng tư toàn hệ thống                | Chưa xác minh đầy đủ                     | Không suy ra từ pytest pass                   |
-| Benchmark toàn hệ thống có I/O                     | Chưa xác minh                            | Không dùng microbenchmark hàm đơn lẻ thay thế |
-| Clean checkout/CI trên commit bàn giao             | Chưa xác minh trong tài liệu này         | Ghi nhận sau khi chạy thực tế                 |
+- Các trường hợp phân loại R01-PV, R02-PV và R03-PV.
+- Thứ tự ưu tiên khi nhiều quy tắc cùng khớp.
+- Ngưỡng sốc theo tuổi.
+- Trường hợp huyết áp thấp và điều kiện giảm huyết áp ở người lớn.
+- Dữ liệu thiếu, `None` và UNKNOWN.
+- Sai kiểu dữ liệu, sai miền giá trị và giá trị NaN/vô hạn.
+- Khóa ngoài allowlist.
+- Xác thực đầu vào trước khi suy luận.
+- Cấu trúc đầu ra, `rule_id` của `THEO_DOI` và tính xác định.
+- Một số kiểm tra nhằm phát hiện giá trị đầu vào xuất hiện trong `ly_do`.
 
-## 9. Liên kết với tài liệu QA khác
+### 6.2. Các nội dung chưa thể kết luận
 
-- `docs/decision-table.md`: nguồn đối chiếu quy tắc và expected.
-- `docs/AC_TRACEABILITY.md`: liên kết tiêu chí nghiệm thu với test/bằng chứng và trạng thái.
-- `docs/SECURITY_PRIVACY_CHECKLIST.md`: danh sách kiểm tra bảo mật và quyền riêng tư.
-- `tests/test_classifier.py`: bộ test sẵn có của dự án.
-- `tests/test_classifier_qa.py`: bộ test QA bổ sung.
+| Hạng mục                       | Bằng chứng còn thiếu                           |
+| ------------------------------ | ---------------------------------------------- |
+| Audit                          | Kiểm tra bản ghi thực tế và đúng bốn trường    |
+| Audit khi đầu vào không hợp lệ | Xác nhận bản ghi `INVALID_INPUT`               |
+| Audit fail-closed              | Mô phỏng lỗi I/O và xác nhận `AuditError`      |
+| Ưu tiên lỗi audit              | Kiểm tra tình huống audit và xác thực cùng lỗi |
+| Lưu audit an toàn              | Xác nhận tệp audit nằm ngoài repository        |
+| Quyền riêng tư toàn hệ thống   | Rà soát mã nguồn, log, test và lịch sử Git     |
+| CI                             | Kết quả chạy trên Pull Request                 |
+| Benchmark                      | Báo cáo p50/p95 và môi trường đo               |
+| README                         | Kiểm tra nội dung và dòng cảnh báo bắt buộc    |
 
-Nếu trạng thái trong Test Plan khác với kết quả chạy mới nhất hoặc bảng truy vết, cần cập nhật các tài liệu để thống nhất.
+Lưu ý: Một test kiểm tra vài giá trị cụ thể không đủ chứng minh `ly_do` không thể làm lộ bất kỳ dữ liệu đầu vào nào. Tương tự, 79 test PASS không tự chứng minh audit an toàn hoặc mọi nhánh nghiệp vụ đã được bao phủ.
 
+## 7. Kiểm thử audit và quyền riêng tư
+
+Các kiểm tra audit phải tuân theo REQUIREMENTS v1.1:
+
+1. Mỗi lần gọi tạo đúng một bản ghi.
+2. Bản ghi chỉ chứa `Timestamp`, `User_UUID`, `Action_Type`, `Status`.
+3. `Timestamp` sử dụng ISO 8601 UTC.
+4. `User_UUID` là UUID phiên tổng hợp.
+5. `Action_Type` phải là `CLASSIFY`.
+6. `Status` chỉ nhận `SUCCESS` hoặc `INVALID_INPUT`.
+7. Khi đầu vào không hợp lệ và audit hoạt động, ghi `INVALID_INPUT` trước khi phát sinh lỗi xác thực tương ứng.
+8. Khi audit thất bại, phát sinh `AuditError` kế thừa `RuntimeError`, giữ lỗi gốc trong `__cause__` và không trả kết quả phân loại.
+9. Nếu cả audit và xác thực đều lỗi, `AuditError` được ưu tiên.
+10. Không ghi dữ liệu bệnh nhân thô, triệu chứng, chỉ số sức khỏe, PII hoặc bí mật vào log.
+11. Tệp audit phải nằm ngoài repository và không được commit.
+
+Trước khi commit, phải xác minh thư mục `.audit_logs/` đã xuất hiện trong `git status` trước đó. Không được coi việc thêm thư mục này vào `.gitignore` là đủ nếu vị trí lưu audit thực tế vẫn nằm trong repository.
+
+## 8. Kiểm thử hiệu năng
+
+Benchmark phải đáp ứng các yêu cầu:
+
+- Chạy ít nhất 100 lượt warm-up.
+- Đo ít nhất 1000 lượt chạy.
+- Báo cáo percentile p50 và p95 theo phương pháp nearest-rank.
+- Ghi rõ cấu hình máy và môi trường thực thi.
+- Tính cả chi phí audit thực tế.
+- Đáp ứng p95 dưới 100 ms.
+
+**Trạng thái:** Chưa xác minh do chưa có báo cáo benchmark phù hợp trong bằng chứng hiện có.
+
+## 9. Điều kiện hoàn tất kiểm thử
+
+Chỉ coi hoạt động kiểm thử đã hoàn tất khi có đủ các bằng chứng sau:
+
+- [ ] Đối chiếu logic và expected result với `docs/decision-table.md`, tag `bkt-2026-v1`.
+- [ ] Bộ test hiện có chạy thành công.
+- [ ] Audit đáp ứng hợp đồng bốn trường và xử lý đúng các tình huống lỗi.
+- [ ] Xác nhận không có dữ liệu nhạy cảm trong log hoặc repository.
+- [ ] Xác nhận audit nằm ngoài repository.
+- [ ] CI chạy thành công trên Pull Request.
+- [ ] Benchmark đáp ứng yêu cầu và có báo cáo p50/p95.
+- [ ] README có đầy đủ hướng dẫn và cảnh báo bắt buộc.
+- [ ] `git diff --check` không báo lỗi định dạng.
+- [ ] Danh sách file chuẩn bị commit không chứa log audit hoặc dữ liệu ngoài phạm vi.
+
+## 10. Kết luận
+
+Tại thời điểm lập tài liệu, bộ kiểm thử đã ghi nhận **79/79 test PASS trong 0.27 giây** trên môi trường Windows với Python 3.15.1 và pytest 9.2.0.
+
+Kết quả này cung cấp bằng chứng tích cực cho các nhóm kiểm thử logic phân loại, xác thực đầu vào và cấu trúc đầu ra. Tuy nhiên, audit, quyền riêng tư toàn hệ thống, CI, benchmark và README vẫn cần được xác minh bằng bằng chứng riêng.
+
+Tài liệu này cần được cập nhật khi có kết quả kiểm thử mới. Không đánh dấu toàn bộ hệ thống đạt yêu cầu chỉ dựa trên số lượng test PASS.
