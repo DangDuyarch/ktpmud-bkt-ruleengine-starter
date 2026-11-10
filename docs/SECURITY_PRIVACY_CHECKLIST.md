@@ -5,7 +5,6 @@
 - **Dự án:** KTPMUD Hack Marathon 2026
 - **Track:** Track A — Dr May Day: Rule Engine Sprint
 - **Nhóm:** 26
-- **Phiên bản yêu cầu:** REQUIREMENTS v1.1
 - **Nguồn quy tắc nghiệp vụ duy nhất:** `docs/decision-table.md`, tag `bkt-2026-v1`
 - **Bộ kiểm thử:** `tests/test_classifier.py`, `tests/test_classifier_qa.py`
 - **Kết quả kiểm thử gần nhất được ghi nhận:** 79 passed, 0 failed, 0.27 giây
