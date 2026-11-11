@@ -9,17 +9,17 @@
 <!-- Track A: A-01…A-11 · Track B: B-01…B-10 (đề thi Mục 7.3 / 8.3). Đủ mọi mã. -->
 | Mã | Trạng thái (Chưa / Đang / Xong) | Bằng chứng (commit / CI / file) | Ghi chú |
 |---|---|---|---|
-| A-01 | Đang | tests/test_classifier_qa.py | Đã test contract, cần đối chiếu đầy đủ |
-| A-02 | Đang | Review code | Chưa xác minh đầy đủ |
-| A-03 | Đang | 79 test PASS | Đã test nhiều rule và ngưỡng biên |
-| A-04 | Xong | tests/test_classifier_qa.py | Có test missing, invalid, sai kiểu |
-| A-05 | Đang | tests/test_classifier_qa.py | Cần rà soát toàn bộ nội dung lý do |
-| A-06 | Đang | rule_engine/classifier.py | Đã chuyển log ra ngoài repo, cần kiểm tra thêm |
-| A-07 | Xong | 79 test PASS | Đã có bộ test mở rộng |
-| A-08 | Đang | python -m pytest -v | Chưa xác minh clean checkout |
-| A-09 | Chưa | Chưa có bằng chứng CI | Cần kiểm tra CI trên Pull Request |
-| A-10 | Chưa | Chưa có benchmark | Cần đo ít nhất 1.000 lần |
-| A-11 | Chưa | Chưa rà README | Cần kiểm tra cảnh báo và hướng dẫn |
+| A-01 | Đang | tests/test_classifier_qa.py; commit c19db18 | Đã có test contract nhưng chưa đối chiếu đầy đủ với yêu cầu classify(). Cần kiểm tra trực tiếp các input tổng quát, output và xác nhận không còn NotImplementedError. |
+| A-02 | Đang | Mã nguồn cần review; commit c19db18 liên quan đến mở rộng test QA | Chưa có kết quả review xác nhận không hard-code ID của public fixture. Cần kiểm tra code và thử với fixture độc lập. |
+| A-03 | Đang | tests/test_classifier_qa.py; kết quả python -m pytest -v: 79 passed | Đã có bộ test mở rộng nhưng chưa có bảng đối chiếu chứng minh bao phủ đầy đủ decision table, các tầng phân loại, trường hợp overlap và giá trị sát biên. |
+| A-04 | Đang | tests/test_classifier_qa.py; kết quả python -m pytest -v: 79 passed | Cần đối chiếu từng test với các trường hợp missing/null/invalid, khóa lạ, dữ liệu ngoài miền và xử lý TypeError/ValueError theo policy. Chưa đánh dấu Xong khi chưa xác minh đủ. |
+| A-05 | Đang | tests/test_classifier_qa.py; kết quả python -m pytest -v: 79 passed | Cần kiểm tra assertion của ly_do, khả năng truy vết rule, không chứa lời khuyên điều trị và kết quả nhất quán khi chạy lặp cùng input. |
+| A-06 | Đang | rule_engine/classifier.py; đã thử cấu hình AUDIT_LOG_DIR để lưu log ngoài repo trong phiên Git Bash | Chưa có bằng chứng đầy đủ về nội dung audit đúng bốn trường, không ghi raw clinical input, xử lý lỗi ghi log và kiểm tra PII/secret trong repo. Cần kiểm tra cả hành vi khi không cấu hình biến môi trường. |
+| A-07 | Đang | tests/test_classifier_qa.py; kết quả python -m pytest -v: 79 passed; commit c19db18 | Đã có bộ test QA mở rộng và chạy thành công. Cần đối chiếu, xác nhận đủ test normal, boundary, invalid và missing, đồng thời xác nhận bộ test đáp ứng yêu cầu thay thế test stub. |
+| A-08 | Đang | Kết quả chạy python -m pytest -v: 79 passed trên máy hiện tại | Chưa có bằng chứng chạy pytest -q thành công từ clean checkout. Cần ghi lại lệnh và kết quả chạy thực tế từ môi trường sạch. |
+| A-09 | Chưa | Chưa có URL lượt chạy CI thành công được xác nhận | Cần cung cấp link CI chạy test thành công trên Pull Request. |
+| A-10 | Chưa | Chưa có script và kết quả benchmark được xác nhận | Cần benchmark ít nhất 1.000 lần, báo cáo p50/p95, xác nhận p95 dưới 100 ms, nêu cấu hình máy đo và tính cả thời gian audit. |
+| A-11 | Chưa | Chưa có bằng chứng review README được xác nhận | Cần kiểm tra README có cảnh báo “educational/synthetic — not for clinical use” và hướng dẫn cài đặt, chạy chương trình, chạy test. |
 
 ### 1.2. Sửa đổi bắt buộc từ Checkpoint 1
 <!-- Các mục ❗ trong nhận xét Checkpoint 1 của nhóm. Nếu không có, ghi "Không có". -->
