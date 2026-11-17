@@ -2,12 +2,20 @@
 
 import datetime
 import os
+import sys
 import uuid
+from pathlib import Path
+
+# Đảm bảo pytest (kể cả trên CI Linux) luôn tìm thấy thư mục gốc chứa rule_engine
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import pytest
 from rule_engine.classifier import AuditError, classify
 
 
-# 1. MA TRẬN TÌNH HUỐNG LÂM SÀNG (A-01, A-03, A-04, A-05) 
+# --- 1. MA TRẬN TÌNH HUỐNG LÂM SÀNG (A-01, A-03, A-04, A-05) ---
 
 def test_tc01_r01_pv():
     patient = {
@@ -118,7 +126,7 @@ def test_tc18_validation_before_missing_tuoi():
         classify({"tuoi": None, "co_di_nguyen_nghi_ngo": "true"})
 
 
-#  2. TEST VALIDATION LỖI (TYPEERROR & VALUEERROR - SEC-02, SEC-03)
+# --- 2. TEST VALIDATION LỖI (TYPEERROR & VALUEERROR - SEC-02, SEC-03) ---
 
 def test_invalid_type_age_str():
     with pytest.raises(TypeError):
@@ -126,6 +134,7 @@ def test_invalid_type_age_str():
 
 
 def test_invalid_type_bool_int():
+    # Bool nhận số 1 -> TypeError
     with pytest.raises(TypeError):
         classify({"tuoi": 20.0, "co_di_nguyen_nghi_ngo": 1})
 
@@ -142,7 +151,7 @@ def test_invalid_value_negative_bp():
         classify({"tuoi": 30, "huyet_ap_tam_thu": -10})
 
 
-# 3. TEST AUDIT TRAIL & FAIL-CLOSED SECURITY (A-06, SEC-05..SEC-11)
+# --- 3. TEST AUDIT TRAIL & FAIL-CLOSED SECURITY (A-06, SEC-05..SEC-11) ---
 
 def test_audit_success_4_fields_and_no_pii(tmp_path, monkeypatch):
     """SEC-05, SEC-06, SEC-07: Kiểm tra log SUCCESS đủ 4 trường, chuẩn UTC ISO, không lộ raw input."""
@@ -198,7 +207,6 @@ def test_audit_invalid_input_logs_before_raise(tmp_path, monkeypatch):
 
 def test_audit_fail_closed_raises_audit_error_with_cause(tmp_path, monkeypatch):
     """SEC-09: Khi audit lỗi I/O -> raise AuditError kế thừa RuntimeError, giữ __cause__, không trả kết quả."""
-    # Tạo một file thường trùng tên với AUDIT_LOG_DIR để os.makedirs/open gây lỗi OSError/FileExistsError
     blocked_path = tmp_path / "blocked_file"
     blocked_path.write_text("not a directory", encoding="utf-8")
     monkeypatch.setenv("AUDIT_LOG_DIR", str(blocked_path))

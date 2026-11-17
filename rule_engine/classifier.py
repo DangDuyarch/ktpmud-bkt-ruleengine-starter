@@ -245,7 +245,7 @@ def classify(patient: PatientInput) -> ClassificationResult:
     """Phân loại phản vệ theo đúng REQUIREMENTS v1.1."""
     # 1. Validate toàn bộ input.
     # SEC-08 & SEC-10: Nếu validation lỗi -> ghi audit INVALID_INPUT.
-    # Nếu audit cũng lỗi -> AuditError được tự động ưu tiên (không nuốt lỗi).
+    # Nếu audit cũng lỗi -> AuditError được tự động ưu tiên.
     try:
         _validate_input(patient)
     except (TypeError, ValueError) as err:
