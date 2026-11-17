@@ -1,4 +1,4 @@
-# KẾ HOẠCH KIỂM THỬ — TEST_PLAN
+# BÁO CÁO KẾ HOẠCH KIỂM THỬ — TEST_REPORT
 
 ## 1. Thông tin chung
 
