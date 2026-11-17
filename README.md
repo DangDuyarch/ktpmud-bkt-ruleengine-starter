@@ -1,36 +1,32 @@
-# KTPMUD BKT-1 (Track A) — Dr May Day: Rule Engine Sprint — Starter
+# BKT Rule Engine — Nhóm 26
 
-Khung project khoi dong cho **Bai kiem tra Hackathon BKT-1 (Track A)**, mon
-Ky thuat Phan mem Ung dung (KTPMUD). **Day la skeleton rong**, khong phai loi
-giai mau — sinh vien fork repo nay va hien thuc `rule_engine/classifier.py`.
+**Track A — Dr May Day: Rule Engine Sprint**
 
-## Boi canh
+---
 
-**Dac ta chinh thuc (Data Dictionary + bang quyet dinh V1) nam o
-[`docs/decision-table.md`](docs/decision-table.md) trong chinh repo nay.**
-`do_an_mon_hoc.md` cua KTPMUD chi yeu cau tuan thu chuan WAO/EAACI, khong co
-bang chi tiet - dung dung `docs/decision-table.md` lam nguon duy nhat.
+##  Tóm tắt sản phẩm
 
-**Khong tu suy dien nguong/quy tac lam sang moi ngoai `docs/decision-table.md`.**
+Hệ thống xây dựng **Rule Engine** bằng **Python** cung cấp hàm `classify(patient)` để tiếp nhận dữ liệu synthetic, kiểm tra tính hợp lệ của đầu vào, áp dụng các quy tắc `R01-PV`, `R02-PV`, `R03-PV` và `R-SOC` theo **Decision Table V1**, sau đó trả về kết quả phân loại gồm `muc_do`, `rule_id` và `ly_do`. Hệ thống hỗ trợ xử lý dữ liệu thiếu, logic ba trạng thái và ghi audit trail theo đúng yêu cầu.
 
-## Cach chay
+>  **Cảnh báo bắt buộc:** `educational/synthetic — not for clinical use`.
+
+---
+
+## Hướng dẫn cài đặt, chạy và kiểm thử từ clean checkout
+
+### Yêu cầu hệ thống
+* **Git**, **Python** (gọi được bằng lệnh `python`), **pip**.
+* *(Đã kiểm thử thành công trên Windows, Python 3.15.1, pytest 9.2.0).*
+
+### Các bước thực hiện:
 
 ```bash
-pip install -r requirements.txt
-pytest -q
-```
+# 1. Clone repository
+git clone [https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git](https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git) 
+cd ktpmud-bkt-ruleengine-starter 
 
-## MVP bat buoc
+# 2. Cài đặt các gói phụ thuộc
+python -m pip install -e .
 
-- Ham `classify()` trong `rule_engine/classifier.py` chay dung theo dac ta.
-- Co bo test tu dong (`pytest`) voi it nhat 1 ca cho moi muc nguy co.
-- Benchmark latency < 100ms (tu do, ghi vao bao cao np).
-- Audit trail `[Timestamp, User_UUID, Action_Type, Status]` cho moi lan phan loai.
-
-## Luu y
-
-- Day la khung khoi dong — **khong chua bo test an dung de cham diem**
-  (xem BKT-PR-2b trong de xuat KTPMUD). GV/TA se cham bang bo test rieng.
-- Nop bai qua `ktpmud-project` theo dung huong dan `nop_bai.md` cua KTPMUD,
-  khong tao ha tang nop bai moi.
-
+# 3. Chạy bộ kiểm thử (pytest)
+python -m pytest -q
