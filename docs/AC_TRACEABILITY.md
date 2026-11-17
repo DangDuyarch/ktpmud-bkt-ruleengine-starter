@@ -7,97 +7,132 @@
 - **Nhóm:** 26
 - **Nguồn quy tắc nghiệp vụ:** `docs/decision-table.md`, tag `bkt-2026-v1`
 - **Bộ kiểm thử:** `tests/test_classifier.py`, `tests/test_classifier_qa.py`
-- **Kết quả kiểm thử ghi nhận:** 79 passed, 0 failed, thời gian 0.27 giây
 
-Tài liệu này liên kết yêu cầu chức năng, yêu cầu phi chức năng, tiêu chí nghiệm thu và bằng chứng kiểm thử hiện có. Trạng thái chỉ phản ánh bằng chứng đã ghi nhận, không mặc định rằng toàn bộ hệ thống đã đáp ứng yêu cầu.
+### Nguyên tắc ghi nhận
 
-## 2. Quy ước trạng thái
+Trạng thái trong tài liệu phản ánh bằng chứng đã kiểm tra, không chỉ dựa vào tên test, comment trong mã nguồn hoặc kết quả của một lần chạy pytest.
 
-| Trạng thái                    | Ý nghĩa                                                                     |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| Đã có bằng chứng kiểm thử     | Có test tương ứng và test đã PASS; chưa mặc nhiên xác nhận toàn bộ yêu cầu. |
-| Đạt trong phạm vi đã kiểm tra | Có bằng chứng phù hợp với phạm vi tiêu chí đang xét.                        |
-| Chưa xác minh                 | Chưa có đủ bằng chứng để kết luận.                                          |
-| Không đạt                     | Có bằng chứng cho thấy tiêu chí không được đáp ứng.                         |
+- **Đã kiểm tra:** Có test hoặc kết quả rà soát trực tiếp hỗ trợ nhận định trong phạm vi ghi rõ.
+- **Đã kiểm tra một phần:** Có bằng chứng nhưng chưa bao phủ đầy đủ yêu cầu.
+- **Chưa xác minh:** Chưa có đủ bằng chứng để kết luận.
+- **Chưa đạt:** Đã có bằng chứng cho thấy tiêu chí không được đáp ứng.
 
-## 3. Bảng truy vết tiêu chí nghiệm thu
+Không suy diễn rằng toàn bộ yêu cầu đã đạt chỉ vì bộ test tự động không có lỗi.
 
-| AC ID | Tiêu chí nghiệm thu                                                                                                                          | Bằng chứng hiện có                                                                                                       | Trạng thái                        |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
-| A-01  | Hàm `classify(patient)` thực hiện phân loại và trả về kết quả theo hợp đồng.                                                                 | Bộ test phân loại, kiểm tra cấu trúc đầu ra và các trường hợp dữ liệu đầu vào.                                           | Đã có bằng chứng kiểm thử         |
-| A-02  | Kết quả không phụ thuộc vào việc hardcode ID hoặc dữ liệu của bộ test công khai.                                                             | Output pytest chưa cho thấy bằng chứng riêng xác nhận tính tổng quát của mã nguồn.                                       | Chưa xác minh                     |
-| A-03  | Phân loại đúng theo R01, R02, R03, R-SOC; xử lý ngưỡng huyết áp, thứ tự ưu tiên và trường hợp biên.                                          | Các test R01/R02/R03, ưu tiên R02-R03, ngưỡng theo tuổi, giảm huyết áp đúng/trên 30% và huyết áp thấp đơn độc.           | Đã có bằng chứng kiểm thử         |
-| A-04  | Xử lý dữ liệu thiếu, `None`, UNKNOWN, sai kiểu, sai miền giá trị và khóa ngoài danh sách cho phép đúng hợp đồng.                             | Các test dữ liệu thiếu, UNKNOWN, `TypeError`, `ValueError`, khóa dư và kiểm tra dữ liệu trước khi suy luận.              | Đã có bằng chứng kiểm thử         |
-| A-05  | Kết quả có đúng ba khóa; `rule_id` phù hợp; `ly_do` ổn định và không đưa các giá trị đầu vào cụ thể vào lời giải thích.                      | Các test cấu trúc đầu ra, `THEO_DOI` có `rule_id=None`, tính xác định và `test_ly_do_khong_chua_gia_tri_input_dac_biet`. | Đã có bằng chứng kiểm thử         |
-| A-06  | Mỗi lần gọi ghi audit đúng bốn trường; không lộ dữ liệu bệnh nhân; xử lý lỗi audit theo cơ chế fail-closed.                                  | Output pytest được cung cấp chưa thể hiện test audit, kiểm tra nội dung log hoặc mô phỏng lỗi I/O.                       | Chưa xác minh                     |
-| A-07  | Có bộ test cho trường hợp thông thường, biên, dữ liệu thiếu và dữ liệu không hợp lệ.                                                         | Hai bộ test thu thập tổng cộng 79 test và đều PASS trong lần chạy đã ghi nhận.                                           | Đạt trong phạm vi bộ test đã chạy |
-| A-08  | Lệnh pytest chạy thành công trên phiên bản mã nguồn đang kiểm thử.                                                                           | `python -m pytest -v`: 79 passed, 0 failed, 0.27 giây.                                                                   | Đạt trong lần chạy đã ghi nhận    |
-| A-09  | CI tự động chạy và đạt trên Pull Request theo yêu cầu dự án.                                                                                 | Output pytest cục bộ không chứng minh CI trên Pull Request đã chạy thành công.                                           | Chưa xác minh                     |
-| A-10  | Benchmark có tối thiểu 1000 lượt đo sau 100 lượt làm nóng; báo cáo p50/p95 và p95 dưới 100 ms trên máy được khai báo, tính cả audit thực tế. | Chưa có output benchmark phù hợp trong bằng chứng được cung cấp.                                                         | Chưa xác minh                     |
-| A-11  | README có hướng dẫn cài đặt, chạy, kiểm thử và dòng cảnh báo bắt buộc chính xác.                                                             | Chưa có bằng chứng kiểm tra nội dung README trong lần đối chiếu này.                                                     | Chưa xác minh                     |
+## 2. Truy vết tiêu chí nghiệm thu
 
-## 4. Truy vết yêu cầu chức năng
+| AC   | Tiêu chí nghiệm thu                                                                                        | Bằng chứng hiện có                                                                                                                                                                                                                                                                                       | Trạng thái                                                             |
+| ---- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| A-01 | Hàm `classify()` thực hiện phân loại thay vì còn là scaffold chưa triển khai.                              | Đã đọc mã nguồn `rule_engine/classifier.py` và các test gọi trực tiếp `classify()`. Có kiểm tra kết quả phân loại và lỗi đầu vào.                                                                                                                                                                        | Đã kiểm tra; cần tiếp tục đối chiếu đầy đủ với đặc tả                  |
+| A-02 | Logic không hard-code theo ID hoặc dữ liệu riêng của public fixture.                                       | Đã rà soát `rule_engine/classifier.py`, `tests/test_classifier.py` và `docs/decision-table.md`; chưa phát hiện dấu hiệu hardcode dữ liệu kiểm thử trong phạm vi đã rà soát.                                                                                                                              | Đã kiểm tra trong phạm vi rà soát                                      |
+| A-03 | Bao phủ các quy tắc R01, R02, R03, điều kiện sốc phản vệ và các trường hợp biên quan trọng.                | `tests/test_classifier_qa.py` có test riêng cho R01/R02/R03, ưu tiên R02 so với R03, ngưỡng huyết áp theo tuổi, giảm huyết áp đúng 30% và trên 30%, cùng các trường hợp thiếu dữ liệu.                                                                                                                   | Đã kiểm tra một phần; cần đối chiếu toàn bộ decision table             |
+| A-04 | Xử lý trường thiếu, `None`, `UNKNOWN`, sai kiểu, ngoài miền và khóa không được phép theo hợp đồng đầu vào. | Có các test `test_thieu_truong_bool_duoc_coi_la_unknown`, `test_sai_kieu_du_lieu_phat_sinh_type_error`, `test_sai_mien_du_lieu_phat_sinh_value_error`, `test_khoa_ngoai_allowlist_phat_sinh_value_error`, cùng các test validation trước suy luận.                                                       | Đã kiểm tra trong phạm vi các test hiện có                             |
+| A-05 | Đầu ra có cấu trúc đúng; `ly_do` không làm lộ giá trị đầu vào; kết quả ổn định với cùng input.             | Có `test_dau_ra_chi_co_ba_khoa`, `test_theo_doi_luon_co_rule_id_none`, `test_cung_input_cho_cung_ket_qua_phan_loai` và `test_ly_do_khong_chua_gia_tri_input_dac_biet`.                                                                                                                                   | Đã kiểm tra trong phạm vi các assertion hiện có                        |
+| A-06 | Audit có đúng bốn trường, ghi trạng thái phù hợp, hạn chế dữ liệu thô và xử lý lỗi ghi log theo yêu cầu.   | Có năm test audit trong `tests/test_classifier.py`: `test_audit_success_4_fields_and_no_pii`, `test_audit_invalid_input_logs_before_raise`, `test_audit_fail_closed_raises_audit_error_with_cause`, `test_audit_error_takes_precedence_over_validation_error`, `test_default_audit_dir_is_outside_repo`. | Đã kiểm tra một phần; cần siết assertion UTC và đối chiếu đầy đủ FR-08 |
+| A-07 | Có test cho các trường hợp bình thường, biên và đầu vào không hợp lệ.                                      | Hai file test có các nhóm test quy tắc, ngưỡng huyết áp, dữ liệu thiếu, sai kiểu, sai miền và khóa ngoài allowlist.                                                                                                                                                                                      | Đã kiểm tra trong phạm vi test hiện có                                 |
+| A-08 | Bộ test tự động chạy được và kết quả được ghi nhận chính xác.                                              | Lần chạy đầy đủ gần nhất được ghi nhận trong quá trình QA: `84 passed`. Kết quả này thuộc lần chạy tại thời điểm đó, không xác nhận trạng thái của các thay đổi chưa chạy lại.                                                                                                                           | Đã có kết quả lịch sử; cần chạy lại trên trạng thái mã nguồn hiện tại  |
+| A-09 | CI chạy test trên cấu hình và commit cần bàn giao.                                                         | Đã có bằng chứng workflow thành công trên một số commit trước đó; chưa xác nhận workflow thành công trên commit mới nhất dự kiến bàn giao.                                                                                                                                                               | Chưa xác minh trên commit bàn giao                                     |
+| A-10 | Benchmark đáp ứng yêu cầu hiệu năng, có warm-up và ít nhất 1.000 lượt đo; báo cáo p50/p95.                 | Chưa có bằng chứng benchmark đầy đủ trên phiên bản dự kiến bàn giao được xác nhận trong đợt rà soát này.                                                                                                                                                                                                 | Chưa xác minh                                                          |
+| A-11 | README có hướng dẫn cài đặt, chạy, kiểm thử và cảnh báo sử dụng giáo dục, không dùng cho lâm sàng.         | Chưa đối chiếu đầy đủ nội dung README hiện tại với từng tiêu chí trong lần rà soát này.                                                                                                                                                                                                                  | Chưa xác minh                                                          |
 
-| Yêu cầu | Nội dung                                                                                      | AC liên quan | Bằng chứng kiểm thử đã thấy                                                                                                                                      |
-| ------- | --------------------------------------------------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-01   | Triển khai `classify()` theo hợp đồng đầu vào và đầu ra.                                      | A-01, A-02   | Các test phân loại và kiểm tra cấu trúc đầu ra                                                                                                                   |
-| FR-02   | Thực hiện chính xác R01, R02, R03.                                                            | A-01, A-03   | `test_r01_*`, `test_r02_*`, `test_r03_*`                                                                                                                         |
-| FR-03   | Áp dụng ngưỡng R-SOC theo tuổi và điều kiện giảm huyết áp ở người lớn.                        | A-03         | `test_nguong_soc_theo_tuoi`, `test_nguoi_lon_giam_*`, `test_nguoi_lon_hatt_duoi_90_khong_can_hatt_nen`                                                           |
-| FR-04   | Xử lý thứ tự quyết định, tuổi thiếu và độ ưu tiên của quy tắc.                                | A-03, A-04   | `test_tc12_missing_tuoi`, `test_tc18_validation_before_missing_tuoi`, `test_r02_duoc_uu_tien_hon_r03_khi_cung_khop`                                              |
-| FR-05   | Xử lý dữ liệu thiếu và UNKNOWN theo logic ba trạng thái.                                      | A-04         | `test_thieu_truong_bool_duoc_coi_la_unknown`, `test_rule_da_true_khong_bi_huy_vi_truong_khac_unknown`, `test_r02_unknown_khi_chua_du_hai_true_nhung_con_unknown` |
-| FR-06   | Kiểm tra nghiêm ngặt kiểu, miền giá trị và khóa đầu vào.                                      | A-04         | Các test `test_sai_kieu_du_lieu_*`, `test_sai_mien_du_lieu_*`, `test_khoa_ngoai_allowlist_phat_sinh_value_error`                                                 |
-| FR-07   | Trả đúng cấu trúc kết quả, giải thích xác định, không đưa dữ liệu đầu vào cụ thể vào `ly_do`. | A-05         | `test_dau_ra_chi_co_ba_khoa`, `test_theo_doi_luon_co_rule_id_none`, `test_cung_input_cho_cung_ket_qua_phan_loai`, `test_ly_do_khong_chua_gia_tri_input_dac_biet` |
-| FR-08   | Ghi audit đúng bốn trường cho mỗi lần gọi.                                                    | A-06         | Chưa có bằng chứng audit trong output pytest được cung cấp                                                                                                       |
+## 3. Truy vết yêu cầu chức năng
 
-## 5. Truy vết yêu cầu phi chức năng
+| Yêu cầu | Nội dung cần xác minh                                                                                 | Bằng chứng                                                                                                                              | Trạng thái                                                                             |
+| ------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| FR-01   | Đầu vào tuân theo allowlist và không phân loại dựa trên ID fixture cố định.                           | Đã rà soát allowlist trong mã nguồn và chưa phát hiện dấu hiệu hardcode dữ liệu kiểm thử trong phạm vi đã xem.                          | Đã kiểm tra trong phạm vi rà soát                                                      |
+| FR-02   | Quy tắc R01, R02 và R03 được thực hiện theo decision table.                                           | Có test riêng cho các quy tắc, trường hợp khớp/không khớp và ưu tiên quy tắc.                                                           | Đã kiểm tra một phần                                                                   |
+| FR-03   | Điều kiện sốc phản vệ được đánh giá theo ngưỡng huyết áp và điều kiện quy định.                       | Có test ngưỡng theo tuổi, huyết áp tâm thu dưới 90, giảm đúng 30% và giảm trên 30%.                                                     | Đã kiểm tra một phần                                                                   |
+| FR-04   | Xử lý thứ tự quyết định, tuổi thiếu và ưu tiên quy tắc.                                               | Có test tuổi thiếu, validation trước suy luận và ưu tiên R02 khi R02/R03 cùng khớp.                                                     | Đã kiểm tra trong phạm vi test hiện có                                                 |
+| FR-05   | Xử lý dữ liệu thiếu và `UNKNOWN` theo logic ba trạng thái.                                            | Có test trường boolean thiếu, quy tắc đã khớp không bị hủy bởi trường khác `UNKNOWN`, và trường hợp R02 chưa đủ hai điều kiện đúng.     | Đã kiểm tra trong phạm vi test hiện có                                                 |
+| FR-06   | Kiểm tra kiểu dữ liệu, miền giá trị và khóa đầu vào.                                                  | Có test `TypeError`, `ValueError`, giá trị ngoài miền, khóa ngoài allowlist và validation trước suy luận.                               | Đã kiểm tra trong phạm vi test hiện có                                                 |
+| FR-07   | Đầu ra có ba khóa `muc_do`, `rule_id`, `ly_do`; lý do không đưa giá trị đầu vào cụ thể vào thông báo. | Có test cấu trúc đầu ra, `rule_id` là `None` cho `THEO_DOI`, tính ổn định kết quả và nội dung `ly_do`.                                  | Đã kiểm tra trong phạm vi test hiện có                                                 |
+| FR-08   | Mỗi lần gọi được audit với bốn trường: timestamp, UUID, action và status.                             | Test SUCCESS kiểm tra bốn trường, UUID hợp lệ, action `CLASSIFY`, status `SUCCESS`; test đầu vào không hợp lệ kiểm tra `INVALID_INPUT`. | Đã kiểm tra một phần; cần kiểm tra chặt UTC và đối chiếu số lần ghi trên các nhánh lỗi |
 
-| Yêu cầu | Nội dung cần xác minh                                                                               | AC liên quan     | Trạng thái                                                          |
-| ------- | --------------------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------- |
-| NFR-01  | Hiệu năng: benchmark đầy đủ, p50/p95, tối thiểu 1000 lượt đo sau warm-up.                           | A-10             | Chưa xác minh                                                       |
-| NFR-02  | Quyền riêng tư: không đưa PII, bí mật hoặc dữ liệu bệnh nhân vào input, test, log hay repository.   | A-06             | Chưa xác minh đầy đủ                                                |
-| NFR-03  | Audit fail-closed; lỗi audit không được trả kết quả phân loại; thông báo lỗi không tiết lộ đầu vào. | A-06             | Chưa xác minh                                                       |
-| NFR-04  | Tách logic quy tắc khỏi I/O, tránh trừu tượng hóa không cần thiết.                                  | A-01, A-02       | Chưa xác minh bằng rà soát mã nguồn                                 |
-| NFR-05  | Có test thông thường, biên, thiếu dữ liệu và dữ liệu lỗi; pytest và CI đáp ứng yêu cầu.             | A-07, A-08, A-09 | Pytest đã PASS; CI chưa xác minh                                    |
-| NFR-06  | Cùng đầu vào tạo cùng kết quả, không phụ thuộc thứ tự gọi.                                          | A-05             | Đã có test tính xác định; cần xem nội dung test để xác nhận phạm vi |
-| NFR-07  | README có hướng dẫn cài đặt, chạy, kiểm thử và cảnh báo bắt buộc.                                   | A-11             | Chưa xác minh                                                       |
+## 4. Truy vết yêu cầu phi chức năng
 
-## 6. Bằng chứng kiểm thử đã ghi nhận
+| Yêu cầu | Nội dung                                                                                                 | Bằng chứng hiện có                                                                                                                                                                              | Trạng thái                             |
+| ------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| NFR-01  | Hiệu năng: warm-up, tối thiểu 1.000 lượt đo, báo cáo p50/p95 theo yêu cầu.                               | Chưa có kết quả benchmark đầy đủ được xác nhận trong lần rà soát này.                                                                                                                           | Chưa xác minh                          |
+| NFR-02  | Quyền riêng tư: không đưa PII, bí mật hoặc dữ liệu bệnh nhân thô vào log và repository.                  | Test audit kiểm tra không chứa một số giá trị đầu vào cụ thể; test khóa ngoài allowlist kiểm tra dữ liệu đầu vào không được phép. Chưa đủ để chứng minh toàn bộ repository không có PII/secret. | Đã kiểm tra một phần                   |
+| NFR-03  | Fail-closed: lỗi ghi audit không được trả kết quả phân loại; lỗi không tiết lộ đầu vào.                  | Có test mong đợi `AuditError`, kiểm tra `__cause__`, và test lỗi audit được ưu tiên hơn lỗi validation.                                                                                         | Đã kiểm tra một phần                   |
+| NFR-04  | Logic nghiệp vụ được tổ chức rõ ràng, tránh phụ thuộc không cần thiết vào I/O.                           | Đã đọc phần mã nguồn phân loại và audit; chưa hoàn tất review thiết kế toàn bộ module theo tiêu chí này.                                                                                        | Đã kiểm tra một phần                   |
+| NFR-05  | Kiểm thử tự động và CI phù hợp với quy trình bàn giao.                                                   | Có hai file test và workflow CI; chưa xác nhận kết quả workflow trên commit bàn giao.                                                                                                           | Đã kiểm tra một phần                   |
+| NFR-06  | Cùng input cho cùng kết quả phân loại, không phụ thuộc thứ tự gọi.                                       | Có `test_cung_input_cho_cung_ket_qua_phan_loai`.                                                                                                                                                | Đã kiểm tra trong phạm vi test hiện có |
+| NFR-07  | README có hướng dẫn cần thiết và cảnh báo chỉ dùng cho mục đích giáo dục/synthetic, không dùng lâm sàng. | Chưa đối chiếu đầy đủ README hiện tại với yêu cầu.                                                                                                                                              | Chưa xác minh                          |
 
-Lần chạy gần nhất được cung cấp:
+## 5. Chi tiết bằng chứng audit
+
+Các test audit hiện có trong `tests/test_classifier.py`:
+
+1. `test_audit_success_4_fields_and_no_pii`
+
+   - Kiểm tra kết quả phân loại thành công.
+   - Kiểm tra file audit tồn tại và chỉ có một dòng trong tình huống test.
+   - Kiểm tra log có đúng bốn trường.
+   - Kiểm tra timestamp có múi giờ, UUID hợp lệ, action `CLASSIFY`, status `SUCCESS`.
+   - Kiểm tra hai giá trị đầu vào cụ thể không xuất hiện trong log.
+   - **Giới hạn:** assertion timestamp hiện tại chỉ kiểm tra `tzinfo is not None`, chưa xác nhận độ lệch UTC bằng 0.
+
+2. `test_audit_invalid_input_logs_before_raise`
+
+   - Gọi `classify()` với khóa ngoài allowlist.
+   - Kiểm tra phát sinh `ValueError`.
+   - Kiểm tra log có `CLASSIFY | INVALID_INPUT`.
+   - Kiểm tra chuỗi CCCD thử nghiệm không xuất hiện trong log.
+   - **Giới hạn:** chưa có assertion đo trực tiếp thứ tự thời gian giữa thao tác ghi log và thời điểm exception được phát sinh.
+
+3. `test_audit_fail_closed_raises_audit_error_with_cause`
+
+   - Mô phỏng đường dẫn audit không thể sử dụng làm thư mục.
+   - Kiểm tra phát sinh `AuditError`, thuộc `RuntimeError`, và giữ nguyên exception nguyên nhân qua `__cause__`.
+
+4. `test_audit_error_takes_precedence_over_validation_error`
+
+   - Mô phỏng đồng thời đầu vào sai và lỗi ghi audit.
+   - Kiểm tra `AuditError` được phát sinh.
+   - Kiểm tra thông báo lỗi không chứa chuỗi đầu vào không hợp lệ.
+
+5. `test_default_audit_dir_is_outside_repo`
+
+   - Bỏ biến môi trường `AUDIT_LOG_DIR`.
+   - Kiểm tra thư mục audit mặc định nằm ngoài thư mục repository hiện tại.
+   - **Giới hạn:** kiểm tra này không chứng minh mọi cấu hình ghi đè `AUDIT_LOG_DIR` đều nằm ngoài repository.
+
+Trong mã nguồn `rule_engine/classifier.py`, timestamp được tạo bằng:
+
+`datetime.datetime.now(datetime.timezone.utc).isoformat()`
+
+Điều này hỗ trợ nhận định rằng implementation tạo timestamp theo UTC. Tuy nhiên, để test xác nhận trực tiếp yêu cầu UTC, nên bổ sung assertion kiểm tra:
+
+`dt.utcoffset() == datetime.timedelta(0)`
+
+Chỉ cập nhật trạng thái kiểm tra UTC sau khi thay đổi test và chạy test thành công.
+
+## 6. Kết quả kiểm thử được ghi nhận
+
+Lần chạy đầy đủ được ghi nhận trước đó:
 
 ```text
-python -m pytest -v
-
-collected 79 items
-79 passed in 0.27s
+84 passed
 ```
 
-Các nhóm kiểm thử thể hiện trong output:
+Đây là kết quả lịch sử. Không dùng kết quả này để khẳng định những thay đổi sau lần chạy đó đã được kiểm thử.
 
-- Quy tắc phân loại R01, R02, R03 và các trường hợp nhiều quy tắc cùng khớp.
-- Ngưỡng sốc theo tuổi, bao gồm các giá trị ở hai phía của ngưỡng.
-- Điều kiện giảm huyết áp đúng 30% và trên 30%.
-- Dữ liệu thiếu, `None`, khóa bị bỏ trống và UNKNOWN.
-- Sai kiểu dữ liệu, sai miền giá trị, giá trị vô hạn/NaN và khóa ngoài allowlist.
-- Kiểm tra dữ liệu lỗi không bị che giấu bởi trường tuổi thiếu.
-- Cấu trúc đầu ra, `rule_id` của `THEO_DOI`, tính xác định và một số trường hợp kiểm tra `ly_do`.
+Trước khi bàn giao, cần chạy lại:
 
-**Giới hạn của bằng chứng:** pytest PASS chỉ chứng minh các test hiện có vượt qua trong môi trường đã chạy. Nó không tự chứng minh rằng mọi nhánh nghiệp vụ đều đã được bao phủ, audit an toàn, CI đạt, benchmark đáp ứng ngưỡng hay README đầy đủ.
+```bash
+python -m pytest -v
+```
 
-## 7. Các hạng mục cần xác minh tiếp
+Sau đó cập nhật số lượng test pass/fail theo output thực tế. Nếu có thay đổi test audit, phải chạy lại cả test audit và bộ test đầy đủ.
 
-1. **A-02:** Rà soát mã nguồn để kiểm tra không hardcode ID hoặc dữ liệu của bộ test công khai.
-2. **A-06:** Kiểm tra triển khai audit, đúng bốn trường, mỗi lần gọi đúng một bản ghi, `INVALID_INPUT`, `SUCCESS`, `AuditError`, lỗi I/O và việc không ghi dữ liệu nhạy cảm.
-3. **A-09:** Kiểm tra kết quả CI trên Pull Request.
-4. **A-10:** Kiểm tra script, cấu hình, số lượt benchmark, p50/p95, máy đo và việc benchmark bao gồm audit.
-5. **A-11:** Đối chiếu README với hướng dẫn cài đặt, chạy, kiểm thử và dòng cảnh báo chính xác.
-6. **A-01, A-03, A-04, A-05, A-07:** Đối chiếu nội dung test và expected với `docs/decision-table.md`, không chỉ dựa vào tên test.
-7. Kiểm tra `.audit_logs/` và các tệp phát sinh để bảo đảm không đưa log nhạy cảm hoặc dữ liệu ngoài phạm vi vào commit.
+## 7. Các việc còn cần xác minh
 
-## 8. Kết luận
-
-Bộ kiểm thử hiện có đã chạy thành công **79/79 test**. Bằng chứng thể hiện phạm vi kiểm thử đáng kể cho logic phân loại, ngưỡng sốc, dữ liệu thiếu, xác thực đầu vào và cấu trúc đầu ra.
-
-Tuy nhiên, chưa đủ căn cứ để kết luận toàn bộ tiêu chí nghiệm thu đã đạt. Các mục về audit, quyền riêng tư toàn hệ thống, CI, benchmark và README cần được xác minh riêng trước khi bàn giao.
-
-Tài liệu này phải được cập nhật khi có bằng chứng mới; trạng thái nghiệm thu cuối cùng cần thống nhất với mã nguồn, bộ test và REQUIREMENTS v1.1.
+- [ ] Bổ sung assertion UTC trong test audit thành công và chạy lại test.
+- [ ] Đối chiếu đầy đủ expected của các test với `docs/decision-table.md`.
+- [ ] Chạy lại toàn bộ pytest trên mã nguồn hiện tại và ghi đúng kết quả.
+- [ ] Kiểm tra workflow CI trên commit mới nhất dự kiến bàn giao.
+- [ ] Chạy benchmark theo yêu cầu và lưu bằng chứng p50/p95.
+- [ ] Rà soát README theo A-11 / NFR-07.
+- [ ] Hoàn tất rà soát quyền riêng tư và secret trên phạm vi repository, không suy ra từ các test audit đơn lẻ.
+- [ ] Đồng bộ trạng thái giữa `AC_TRACEABILITY.md`, `TEST_PLAN.md` và `SECURITY_PRIVACY_CHECKLIST.md`.
