@@ -5,42 +5,42 @@
 - **Dự án:** KTPMUD Hack Marathon 2026
 - **Track:** Track A — Dr May Day: Rule Engine Sprint
 - **Nhóm:** 26
-- **Nguồn quy tắc nghiệp vụ duy nhất:** `docs/decision-table.md`, tag `bkt-2026-v1`
+- **Nguồn quy tắc nghiệp vụ:** `docs/decision-table.md`, tag `bkt-2026-v1`
 - **Bộ kiểm thử:** `tests/test_classifier.py`, `tests/test_classifier_qa.py`
-- **Kết quả kiểm thử gần nhất được ghi nhận:** 79 passed, 0 failed, 0.27 giây
-- **Cảnh báo bắt buộc:** `educational/synthetic — not for clinical use`
+- **Kết quả kiểm thử đã ghi nhận:** 84 passed, 0 failed. Chưa xác nhận lại sau mọi thay đổi mới nhất.
+- **Cảnh báo sử dụng:** `educational/synthetic — not for clinical use`
 
 ## 2. Quy ước trạng thái
 
-| Trạng thái                    | Ý nghĩa                                                                   |
-| ----------------------------- | ------------------------------------------------------------------------- |
-| Đạt trong phạm vi đã kiểm tra | Có bằng chứng cụ thể xác nhận hạng mục đã đáp ứng.                        |
-| Đã có bằng chứng kiểm thử     | Có test tương ứng đã PASS, nhưng chưa đủ để kết luận toàn bộ yêu cầu đạt. |
-| Chưa xác minh                 | Chưa có đủ bằng chứng từ mã nguồn, test, log hoặc cấu hình.               |
-| Không đạt                     | Có bằng chứng cho thấy hạng mục vi phạm yêu cầu.                          |
+| Trạng thái | Ý nghĩa |
+|---|---|
+| Đạt trong phạm vi đã kiểm tra | Có bằng chứng cụ thể xác nhận hạng mục đáp ứng trong phạm vi đã kiểm tra. |
+| Đã có bằng chứng kiểm thử | Có test tương ứng đã chạy thành công, nhưng chưa đủ để kết luận toàn bộ yêu cầu đạt. |
+| Chưa xác minh | Chưa có đủ bằng chứng từ mã nguồn, test, log hoặc cấu hình. |
+| Cần xử lý và xác minh | Có vấn đề hoặc điều kiện còn phải kiểm tra trước khi kết luận đạt. |
 
 ## 3. Checklist bảo mật và quyền riêng tư
 
-| ID     | Hạng mục                             | Yêu cầu kiểm tra                                                                                                                                                                 | Bằng chứng hiện có                                                                                                                            | Trạng thái                         |
-| ------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| SEC-01 | Dữ liệu tổng hợp                     | Chỉ sử dụng dữ liệu giả lập; không sử dụng dữ liệu bệnh nhân thật.                                                                                                               | Các test thể hiện dữ liệu mẫu, nhưng chưa có rà soát toàn bộ repository.                                                                      | Chưa xác minh đầy đủ               |
-| SEC-02 | Zero PII                             | Chỉ chấp nhận 9 khóa đầu vào được quy định; từ chối khóa ngoài allowlist như `ten`, số định danh, số điện thoại hoặc địa chỉ.                                                    | Có test `test_invalid_value_extra_key_pii` và `test_khoa_ngoai_allowlist_phat_sinh_value_error`.                                              | Đã có bằng chứng kiểm thử          |
-| SEC-03 | Kiểm tra đầu vào                     | Kiểm tra tất cả trường được cung cấp trước khi suy luận; không chuyển đổi ngầm kiểu dữ liệu.                                                                                     | Có các test sai kiểu, sai miền giá trị và lỗi dữ liệu không bị che bởi tuổi thiếu.                                                            | Đã có bằng chứng kiểm thử          |
-| SEC-04 | Không để lộ dữ liệu trong `ly_do`    | Lời giải thích không chứa dữ liệu đầu vào cụ thể hoặc lời khuyên điều trị.                                                                                                       | Có `test_ly_do_khong_chua_gia_tri_input_dac_biet`; test này chỉ kiểm tra một số giá trị cụ thể.                                               | Đã có bằng chứng kiểm thử một phần |
-| SEC-05 | Cấu trúc audit                       | Mỗi lần gọi ghi đúng bốn trường: `Timestamp`, `User_UUID`, `Action_Type`, `Status`.                                                                                              | Chưa có output kiểm tra bản ghi audit trong bằng chứng được cung cấp.                                                                         | Chưa xác minh                      |
-| SEC-06 | Giá trị audit                        | `Timestamp` theo ISO 8601 UTC; `User_UUID` là UUID phiên tổng hợp hợp lệ, không phải mã định danh bệnh nhân; `Action_Type=CLASSIFY`; `Status` là `SUCCESS` hoặc `INVALID_INPUT`. | Chưa có bằng chứng kiểm tra trực tiếp nội dung audit.                                                                                         | Chưa xác minh                      |
-| SEC-07 | Không ghi dữ liệu nhạy cảm vào audit | Không ghi triệu chứng, chỉ số sức khỏe, dữ liệu đầu vào thô, PII hoặc bí mật vào audit.                                                                                          | Chưa có bằng chứng rà soát nội dung log thực tế.                                                                                              | Chưa xác minh                      |
-| SEC-08 | Audit cho đầu vào không hợp lệ       | Khi xác thực thất bại và audit hoạt động, ghi `INVALID_INPUT` rồi phát sinh `TypeError` hoặc `ValueError` phù hợp.                                                               | Bộ test hiện có kiểm tra lỗi đầu vào; chưa thấy bằng chứng riêng xác nhận bản ghi audit tương ứng.                                            | Chưa xác minh                      |
-| SEC-09 | Audit fail-closed                    | Nếu audit lỗi I/O, quyền truy cập hoặc ghi đĩa, phát sinh `AuditError` kế thừa `RuntimeError`, giữ lỗi gốc trong `__cause__` và không trả kết quả phân loại.                     | Chưa có bằng chứng từ test mô phỏng lỗi audit.                                                                                                | Chưa xác minh                      |
-| SEC-10 | Ưu tiên lỗi audit                    | Nếu cả xác thực đầu vào và audit cùng lỗi, `AuditError` phải được ưu tiên; thông báo lỗi không tiết lộ dữ liệu đầu vào.                                                          | Chưa có bằng chứng kiểm thử tình huống hai lỗi đồng thời.                                                                                     | Chưa xác minh                      |
-| SEC-11 | Vị trí lưu audit                     | Tệp audit phải nằm ngoài thư mục repository, không được commit.                                                                                                                  | Trước đó đã ghi nhận `.audit_logs/` xuất hiện trong `git status` dưới dạng chưa được theo dõi. Chưa xác minh vị trí cấu hình ghi log thực tế. | Cần xử lý và xác minh              |
-| SEC-12 | Bí mật và cấu hình                   | Không đưa token, mật khẩu, khóa API, `.env` hoặc thông tin kết nối môi trường thật vào mã nguồn, test, log hay Git.                                                              | Chưa có kết quả rà soát toàn bộ repository và lịch sử Git.                                                                                    | Chưa xác minh                      |
-| SEC-13 | Cảnh báo sử dụng                     | README phải có chính xác dòng `educational/synthetic — not for clinical use`.                                                                                                    | Chưa có bằng chứng kiểm tra README trong lần đối chiếu này.                                                                                   | Chưa xác minh                      |
-| SEC-14 | Kiểm thử bảo mật                     | Các test liên quan phải chạy thành công trên phiên bản đang kiểm tra.                                                                                                            | `python -m pytest -v`: 79 passed, 0 failed. Kết quả không tự chứng minh mọi yêu cầu bảo mật đều đạt.                                          | Đạt trong phạm vi bộ test đã chạy  |
+| ID | Hạng mục | Yêu cầu kiểm tra | Bằng chứng hiện có | Trạng thái |
+|---|---|---|---|---|
+| SEC-01 | Dữ liệu tổng hợp | Chỉ sử dụng dữ liệu giả lập; không sử dụng dữ liệu bệnh nhân thật. | Các test đã xem sử dụng dữ liệu mẫu. Chưa có bằng chứng rà soát toàn bộ repository, lịch sử Git và các tệp liên quan. | Chưa xác minh đầy đủ |
+| SEC-02 | Zero PII / allowlist | Chỉ chấp nhận 9 khóa đầu vào được quy định; từ chối khóa ngoài allowlist, bao gồm khóa chứa PII. | Có `test_invalid_value_extra_key_pii` và `test_khoa_ngoai_allowlist_phat_sinh_value_error`. Các test hỗ trợ xác nhận việc từ chối khóa ngoài allowlist, không chứng minh toàn bộ repository không chứa PII. | Đã có bằng chứng kiểm thử |
+| SEC-03 | Kiểm tra đầu vào | Kiểm tra các trường được cung cấp trước khi suy luận; từ chối kiểu dữ liệu và miền giá trị không hợp lệ. | Bộ QA có test sai kiểu, sai miền giá trị, khóa ngoài allowlist và các trường hợp lỗi ở trường khác không bị che bởi tuổi thiếu. | Đã có bằng chứng kiểm thử |
+| SEC-04 | Không để lộ dữ liệu trong `ly_do` | Lời giải thích không chứa dữ liệu đầu vào cụ thể hoặc lời khuyên điều trị ngoài phạm vi. | Có `test_ly_do_khong_chua_gia_tri_input_dac_biet`. Test kiểm tra một số giá trị cụ thể, không bao phủ mọi dữ liệu có thể có. | Đã có bằng chứng kiểm thử một phần |
+| SEC-05 | Cấu trúc audit | Mỗi lần gọi `classify()` tạo đúng một bản ghi gồm đúng bốn trường. | `test_audit_success_4_fields_and_no_pii` kiểm tra một dòng log có đúng bốn trường. `test_audit_invalid_input_logs_before_raise` kiểm tra một dòng log trong trường hợp đầu vào không hợp lệ. | Đã có bằng chứng kiểm thử |
+| SEC-06 | Giá trị audit | Timestamp ISO 8601 UTC; UUID hợp lệ; `Action_Type=CLASSIFY`; `Status` phù hợp. | `test_audit_success_4_fields_and_no_pii` kiểm tra timestamp phân tích được và có thông tin múi giờ, UUID hợp lệ, `CLASSIFY`, `SUCCESS`. Test chưa kiểm tra trực tiếp độ lệch UTC bằng 0. Test đầu vào không hợp lệ kiểm tra `CLASSIFY | INVALID_INPUT`. | Đã có bằng chứng kiểm thử một phần |
+| SEC-07 | Không ghi dữ liệu nhạy cảm vào audit | Không ghi dữ liệu đầu vào thô, triệu chứng, chỉ số sức khỏe, PII hoặc bí mật vào log. | Test audit thành công kiểm tra các giá trị mẫu `42.5` và `115` không xuất hiện trong log. Test audit đầu vào không hợp lệ kiểm tra chuỗi CCCD mẫu không xuất hiện trong log. Chưa có rà soát toàn diện mọi trường nhạy cảm. | Đã có bằng chứng kiểm thử một phần |
+| SEC-08 | Audit cho đầu vào không hợp lệ | Khi xác thực thất bại và audit hoạt động, ghi `INVALID_INPUT` rồi phát sinh lỗi xác thực phù hợp. | `test_audit_invalid_input_logs_before_raise` kiểm tra trường hợp khóa ngoài allowlist gây `ValueError` và log chứa `CLASSIFY | INVALID_INPUT`. Chưa chứng minh mọi loại lỗi xác thực đều được bao phủ. | Đã có bằng chứng kiểm thử |
+| SEC-09 | Audit fail-closed | Khi audit không ghi được, phát sinh `AuditError`, giữ lỗi gốc và không trả kết quả phân loại. | `test_audit_fail_closed_raises_audit_error_with_cause` mô phỏng đường dẫn audit không thể dùng làm thư mục; xác nhận `AuditError` là `RuntimeError` và có `__cause__`. | Đã có bằng chứng kiểm thử |
+| SEC-10 | Ưu tiên lỗi audit | Khi audit và xác thực cùng lỗi, lỗi audit được ưu tiên; thông báo không tiết lộ dữ liệu đầu vào. | `test_audit_error_takes_precedence_over_validation_error` xác nhận `AuditError` được phát sinh khi đầu vào sai kiểu đồng thời audit không ghi được; thông báo không chứa chuỗi đầu vào mẫu. | Đã có bằng chứng kiểm thử |
+| SEC-11 | Vị trí lưu audit và tránh commit log | Audit phải nằm ngoài repository và không được commit. | Đã thêm `.audit_logs/` vào `.gitignore`; `git check-ignore` đã xác nhận quy tắc bỏ qua. Commit `d1f8774 chore: ignore local audit logs` đã được push. Đã có ghi nhận working tree sạch sau commit. Tuy nhiên, `.gitignore` không chứng minh đường dẫn log thực tế nằm ngoài repository. | Đã xác minh việc ignore; vị trí log thực tế cần xác minh riêng |
+| SEC-12 | Bí mật và cấu hình | Không đưa token, mật khẩu, khóa API, `.env` hoặc thông tin kết nối môi trường thật vào mã nguồn, test, log hay Git. | Chưa có kết quả rà soát toàn bộ repository và lịch sử Git được cung cấp. | Chưa xác minh |
+| SEC-13 | Cảnh báo sử dụng | README có chính xác dòng `educational/synthetic — not for clinical use`. | Chưa có bằng chứng kiểm tra nội dung README hiện tại trong lần đối chiếu này. | Chưa xác minh |
+| SEC-14 | Kiểm thử bảo mật | Bộ test của phiên bản đang kiểm tra chạy thành công. | Kết quả đã ghi nhận: 84 passed, 0 failed. Chưa xác nhận lại sau mọi thay đổi mới nhất. Kết quả tổng thể không tự chứng minh mọi yêu cầu bảo mật đều đạt. | Đạt trong phạm vi lần chạy đã ghi nhận |
 
 ## 4. Yêu cầu bắt buộc đối với audit
 
-Audit trail phải tuân thủ các quy định sau:
+Audit trail phải tuân thủ các yêu cầu sau:
 
 1. Mỗi lần gọi `classify()` tạo đúng một bản ghi audit.
 2. Bản ghi chỉ chứa bốn trường:
@@ -50,101 +50,146 @@ Audit trail phải tuân thủ các quy định sau:
    - `Status`
 3. `SUCCESS` áp dụng khi phân loại hoàn tất, kể cả kết quả `THEO_DOI`.
 4. `INVALID_INPUT` áp dụng khi xác thực đầu vào thất bại và việc ghi audit thành công.
-5. Khi audit thất bại, hệ thống phải fail-closed; không trả kết quả phân loại.
-6. Khi cả audit và xác thực đều thất bại, lỗi audit có mức ưu tiên cao hơn.
+5. Khi audit thất bại, hệ thống phải fail-closed và không trả kết quả phân loại.
+6. Khi audit và xác thực cùng thất bại, lỗi audit được ưu tiên.
 7. Không ghi dữ liệu bệnh nhân thô, triệu chứng, huyết áp, PII hoặc bí mật vào audit.
 8. Thông báo lỗi và chuỗi exception không được làm lộ dữ liệu đầu vào.
-9. Tệp audit phải nằm ngoài repository và tuyệt đối không được đưa vào commit.
+9. Tệp audit phải nằm ngoài repository và không được đưa vào commit.
+
+Các yêu cầu trên là tiêu chí nghiệm thu, không phải bằng chứng rằng toàn bộ tiêu chí đã được đáp ứng. Trạng thái từng mục phải dựa trên test, mã nguồn, log hoặc cấu hình thực tế.
 
 ## 5. Xử lý `.audit_logs/` trước khi commit
 
-Tình trạng đã ghi nhận trước đó:
+### 5.1. Những việc đã thực hiện
 
-```text
-?? .audit_logs/
-```
+- [x] Thêm `.audit_logs/` vào `.gitignore`.
+- [x] Kiểm tra quy tắc ignore bằng `git check-ignore`.
+- [x] Commit thay đổi với commit `d1f8774 chore: ignore local audit logs`.
+- [x] Push commit lên `origin/test/quy-qa-security`.
+- [x] Đã có ghi nhận working tree sạch sau commit.
 
-Điều này cho biết Git đang nhìn thấy thư mục `.audit_logs/` là nội dung chưa được theo dõi tại thời điểm kiểm tra. Nó **không tự chứng minh** rằng tệp audit đã nằm ngoài repository hoặc không chứa dữ liệu nhạy cảm.
+### 5.2. Những việc cần phân biệt và xác minh thêm
 
-Các việc cần thực hiện:
+- [ ] Kiểm tra `git status --short --untracked-files=all` để xác nhận trạng thái hiện tại.
+- [ ] Kiểm tra cấu hình `AUDIT_LOG_DIR` và đường dẫn audit thực tế trong môi trường đang chạy.
+- [ ] Xác nhận log thực tế nằm ngoài repository theo yêu cầu.
+- [ ] Kiểm tra danh sách file đã stage bằng `git diff --cached --name-only` trước lần commit tiếp theo.
+- [ ] Rà soát log để bảo đảm không có PII hoặc dữ liệu nhạy cảm ngoài ý muốn.
+- [ ] Nếu có dấu hiệu log hoặc dữ liệu nhạy cảm từng được commit, kiểm tra lịch sử Git.
 
-- [ ] Kiểm tra cấu hình và vị trí thực tế mà mã nguồn sử dụng để ghi audit.
-- [ ] Xác nhận thư mục audit nằm ngoài repository theo REQUIREMENTS v1.1.
-- [ ] Không chạy `git add .` khi `.audit_logs/` còn nằm trong thư mục làm việc.
-- [ ] Không đưa nội dung log vào tài liệu, ảnh chụp màn hình hoặc commit.
-- [ ] Nếu log đang được tạo bên trong repository, điều chỉnh cấu hình lưu trữ ra ngoài repository.
-- [ ] Chỉ cân nhắc xóa log sau khi đã xác định nội dung, mục đích và cách xử lý phù hợp; không xóa mù quáng.
-- [ ] Kiểm tra lại `git status` và danh sách file đã stage trước khi commit.
+**Lưu ý:** `.gitignore` ngăn Git tự động hiển thị các tệp chưa được theo dõi phù hợp với quy tắc ignore; nó không di chuyển log ra ngoài repository, không tự loại bỏ tệp đã được theo dõi và không xóa dữ liệu đã có trong lịch sử Git.
 
-Thêm `.audit_logs/` vào `.gitignore` có thể giúp ngăn vô tình thêm log, nhưng **không thay thế yêu cầu lưu audit bên ngoài repository**.
+Không cần làm lại bước thêm `.audit_logs/` vào `.gitignore` nếu quy tắc hiện tại vẫn còn và hoạt động đúng. Phần còn lại là xác minh đường dẫn log thực tế và trạng thái Git hiện tại.
 
 ## 6. Các kiểm tra cần bổ sung
 
 ### 6.1. Kiểm tra audit thành công
 
-- [ ] Gọi `classify()` với đầu vào hợp lệ.
-- [ ] Xác nhận có đúng một bản ghi mới.
-- [ ] Xác nhận đủ và chỉ có bốn trường quy định.
-- [ ] Xác nhận định dạng timestamp, UUID và các giá trị action/status.
-- [ ] Xác nhận không có dữ liệu bệnh nhân thô hoặc PII trong bản ghi.
+- [x] Kiểm tra một bản ghi được tạo trong trường hợp phân loại thành công.
+- [x] Kiểm tra bản ghi có đúng bốn trường.
+- [x] Kiểm tra UUID hợp lệ, action là `CLASSIFY` và status là `SUCCESS`.
+- [ ] Bổ sung assertion xác nhận timestamp thực sự ở UTC, ví dụ `dt.utcoffset() == datetime.timedelta(0)`.
+- [ ] Kiểm tra trường hợp kết quả `THEO_DOI` vẫn tạo `SUCCESS`.
+- [ ] Kiểm tra nhiều lần gọi liên tiếp để xác nhận mỗi lần chỉ tạo một bản ghi mới.
+- [x] Kiểm tra một số giá trị đầu vào mẫu không xuất hiện trong audit.
+- [ ] Mở rộng kiểm tra để bao phủ các trường nhạy cảm khác theo hợp đồng dữ liệu.
 
 ### 6.2. Kiểm tra đầu vào không hợp lệ
 
-- [ ] Gọi `classify()` với dữ liệu sai kiểu.
-- [ ] Gọi `classify()` với giá trị ngoài miền hợp lệ.
-- [ ] Gọi `classify()` với khóa ngoài allowlist.
-- [ ] Xác nhận ghi `INVALID_INPUT` nếu audit hoạt động bình thường.
-- [ ] Xác nhận lỗi phát sinh đúng loại và không tiết lộ dữ liệu đầu vào.
+- [x] Kiểm tra trường hợp khóa ngoài allowlist gây `ValueError` và ghi `INVALID_INPUT`.
+- [x] Kiểm tra chuỗi CCCD mẫu không xuất hiện trong bản ghi audit.
+- [ ] Xác nhận riêng các trường hợp sai kiểu và sai miền giá trị đều ghi `INVALID_INPUT` khi audit hoạt động bình thường.
+- [ ] Xác nhận loại exception phù hợp cho các trường hợp đầu vào không hợp lệ còn lại.
+- [ ] Mở rộng kiểm tra thông báo lỗi để bảo đảm không làm lộ dữ liệu đầu vào.
 
 ### 6.3. Kiểm tra lỗi audit
 
-- [ ] Mô phỏng lỗi I/O hoặc lỗi quyền ghi.
-- [ ] Xác nhận phát sinh `AuditError`.
-- [ ] Xác nhận lỗi gốc nằm trong `__cause__`.
-- [ ] Xác nhận không có kết quả phân loại được trả về khi audit thất bại.
-- [ ] Kiểm tra tình huống đồng thời có lỗi xác thực và lỗi audit.
-- [ ] Xác nhận thông báo lỗi không chứa dữ liệu đầu vào.
+- [x] Mô phỏng tình huống không thể ghi audit.
+- [x] Xác nhận phát sinh `AuditError` kế thừa `RuntimeError`.
+- [x] Xác nhận lỗi gốc được lưu trong `__cause__`.
+- [x] Kiểm tra lỗi audit được ưu tiên khi đầu vào cũng không hợp lệ.
+- [x] Kiểm tra thông báo lỗi không chứa chuỗi đầu vào mẫu trong tình huống ưu tiên lỗi.
+- [ ] Kiểm tra bổ sung các trường hợp lỗi I/O hoặc quyền ghi khác nếu cần mở rộng độ bao phủ.
 
 ### 6.4. Kiểm tra repository
 
 - [ ] Rà soát mã nguồn, test, log và tài liệu để tìm PII hoặc bí mật ngoài ý muốn.
 - [ ] Kiểm tra `.env`, token, khóa API và thông tin kết nối môi trường thật.
-- [ ] Xác nhận audit không nằm trong repository.
-- [ ] Xác nhận không stage hoặc commit `.audit_logs/`.
+- [x] Đã thêm `.audit_logs/` vào `.gitignore` và xác nhận quy tắc ignore.
+- [ ] Xác minh vị trí audit thực tế đang được sử dụng.
+- [ ] Kiểm tra trạng thái Git và danh sách file đã stage mới nhất.
 - [ ] Kiểm tra lịch sử Git nếu có dấu hiệu dữ liệu nhạy cảm từng được commit.
+- [ ] Xác minh README có cảnh báo bắt buộc.
 
 ## 7. Bằng chứng kiểm thử hiện có
 
-Lần chạy gần nhất được cung cấp:
+### 7.1. Kết quả bộ test
+
+Kết quả đã ghi nhận:
 
 ```text
-python -m pytest -v
-
-collected 79 items
-79 passed in 0.27s
+84 passed
+0 failed
 ```
 
-Các nhóm test có liên quan đến bảo mật và tính đúng đắn:
+Đây là kết quả được ghi nhận trước đó, chưa xác nhận lại sau mọi thay đổi mới nhất. Để dùng làm bằng chứng cho phiên bản hiện tại, chạy lại:
 
-- Từ chối khóa ngoài allowlist.
-- Từ chối kiểu dữ liệu không hợp lệ.
-- Từ chối giá trị ngoài miền hợp lệ.
-- Kiểm tra xác thực trước khi suy luận.
-- Kiểm tra cấu trúc đầu ra.
-- Kiểm tra tính xác định.
-- Kiểm tra một số giá trị đầu vào không xuất hiện trong `ly_do`.
+```bash
+python -m pytest -v
+```
 
-Giới hạn: output trên chưa chứng minh được audit fail-closed, tính an toàn của log, việc lưu audit ngoài repository, tình trạng CI hoặc việc repository không chứa bí mật.
+### 7.2. Các test audit đã xác định
+
+Trong `tests/test_classifier.py` có năm test audit sau:
+
+1. `test_audit_success_4_fields_and_no_pii`
+2. `test_audit_invalid_input_logs_before_raise`
+3. `test_audit_fail_closed_raises_audit_error_with_cause`
+4. `test_audit_error_takes_precedence_over_validation_error`
+5. `test_default_audit_dir_is_outside_repo`
+
+Các test này cung cấp bằng chứng cho:
+
+- Cấu trúc bản ghi audit gồm bốn trường.
+- Một số kiểm tra dữ liệu đầu vào mẫu không xuất hiện trong log.
+- Trạng thái `INVALID_INPUT` cho một trường hợp đầu vào không hợp lệ.
+- Xử lý lỗi audit và lưu lỗi gốc trong `__cause__`.
+- Ưu tiên lỗi audit khi xác thực đầu vào cũng thất bại.
+- Vị trí thư mục audit mặc định nằm ngoài repository.
+
+### 7.3. Bằng chứng về `.gitignore`
+
+- Quy tắc `.audit_logs/` đã được thêm vào `.gitignore`.
+- `git check-ignore` đã xác nhận quy tắc ignore.
+- Commit `d1f8774 chore: ignore local audit logs` đã được push lên nhánh `test/quy-qa-security`.
+- Đã có ghi nhận working tree sạch sau commit.
+
+Những bằng chứng này xác nhận việc cấu hình Git ignore đã được thực hiện. Chúng không thay thế việc xác minh đường dẫn audit thực tế và việc rà soát lịch sử Git.
+
+### 7.4. Giới hạn của bằng chứng
+
+- Test timestamp hiện kiểm tra timestamp có thông tin múi giờ, chưa trực tiếp xác nhận độ lệch UTC bằng 0.
+- Test không lộ dữ liệu chỉ kiểm tra một số giá trị mẫu, chưa chứng minh mọi loại dữ liệu nhạy cảm đều không thể xuất hiện trong log.
+- Test thư mục mặc định nằm ngoài repository không tự chứng minh mọi cấu hình môi trường đều sử dụng đường dẫn đó.
+- `.gitignore` không chứng minh log thực tế nằm ngoài repository và không loại bỏ tệp đã được theo dõi trước đó.
+- Chưa có kết quả rà soát toàn bộ bí mật trong repository và lịch sử Git.
+- Chưa có bằng chứng kiểm tra nội dung README hiện tại trong lần đối chiếu này.
+- Chưa xác nhận lại tổng số test sau mọi thay đổi mới nhất.
 
 ## 8. Kết luận và điều kiện hoàn tất
 
-Checklist hiện ghi nhận bộ test đã chạy thành công, đồng thời xác định các hạng mục còn cần xác minh.
+Checklist đã được cập nhật từ bản PC1. Các test audit hiện có đã được đưa vào làm bằng chứng; việc thêm `.audit_logs/` vào `.gitignore`, kiểm tra bằng `git check-ignore`, commit và push cũng đã được ghi nhận.
 
-Trước khi coi checklist bảo mật hoàn tất, cần có bằng chứng cụ thể cho:
+Không tiếp tục coi việc xử lý `.audit_logs/` là chưa thực hiện. Tuy nhiên, cần phân biệt việc Git bỏ qua thư mục này với yêu cầu audit thực tế phải nằm ngoài repository.
 
-1. Audit đủ bốn trường, đúng trạng thái và đúng một bản ghi mỗi lần gọi.
-2. Audit fail-closed, xử lý đúng `AuditError` và không làm lộ dữ liệu đầu vào.
-3. Tệp audit nằm ngoài repository và không được commit.
-4. Repository, test, log và tài liệu không chứa PII hoặc bí mật ngoài ý muốn.
-5. README có cảnh báo bắt buộc.
-6. Các kết quả kiểm tra được ghi nhận và liên kết với tiêu chí nghiệm thu tương ứng.
+Trước khi kết luận checklist bảo mật đã hoàn tất, cần:
+
+1. Bổ sung hoặc xác nhận kiểm tra timestamp UTC.
+2. Xác minh `SUCCESS` cho kết quả `THEO_DOI` và số bản ghi qua nhiều lần gọi.
+3. Mở rộng kiểm tra dữ liệu nhạy cảm không xuất hiện trong audit.
+4. Xác minh đường dẫn audit thực tế và trạng thái Git hiện tại.
+5. Rà soát PII, bí mật và lịch sử Git.
+6. Kiểm tra README có cảnh báo bắt buộc.
+7. Chạy lại bộ test sau các thay đổi mới nhất và ghi đúng kết quả thực tế.
+
+**Kết luận:** Đã có bằng chứng kiểm thử cho nhiều hành vi audit và đã xử lý quy tắc Git ignore cho `.audit_logs/`. Chưa đủ bằng chứng để tuyên bố toàn bộ checklist bảo mật và quyền riêng tư đã hoàn tất.
