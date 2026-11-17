@@ -117,3 +117,4 @@ Không có — nhóm không nhận được mục sửa đổi bắt buộc nào
 - Tag: bkt-2026-<mã nhóm>-rc1 · SHA: 
 - Trạng thái cuối từng mã AC: (cập nhật bảng 2.2 hoặc ghi "như 2.2 trừ: …")
 - Những việc trong timeline chưa hoàn thành và lý do:
+
