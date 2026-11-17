@@ -1,14 +1,15 @@
 """Rule Engine WAO/EAACI - Track A: Dr May Day Rule Engine Sprint.
 
-Thực hiện: Nguyễn Hoàng Sơn (Nhóm 26)
+Thực hiện: Nguyễn Hoàng Sơn
 Reviewer: Duy (Spec), Quý (Coverage)
-Quy chuẩn: REQUIREMENTS
+Quy chuẩn: REQUIREMENTS v1.1
 """
 from __future__ import annotations
 
 import datetime
 import math
 import os
+import tempfile
 import uuid
 from typing import Optional, TypedDict
 
@@ -50,11 +51,16 @@ ALLOWED_KEYS = {
 }
 
 
+def _get_default_audit_dir() -> str:
+    """Tra ve thu muc luu audit mac dinh nam hoan toan ngoai repository (SEC-11)."""
+    return os.path.join(tempfile.gettempdir(), "ktpmud_ruleengine_audit")
+
+
 def _log_audit(status: str, user_uuid: Optional[str] = None) -> None:
-    """Ghi audit 4 truong (Timestamp, User_UUID, Action_Type, Status) ra file audit.log."""
-    log_dir = os.environ.get("AUDIT_LOG_DIR", ".audit_logs")
+    """Ghi audit 4 truong (Timestamp, User_UUID, Action_Type, Status) ra file ngoai repo."""
+    log_dir = os.environ.get("AUDIT_LOG_DIR") or _get_default_audit_dir()
     log_file = os.path.join(log_dir, "audit.log")
-    
+
     timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
     uid = user_uuid or str(uuid.uuid4())
     log_entry = f"{timestamp} | {uid} | CLASSIFY | {status}\n"
@@ -68,7 +74,7 @@ def _log_audit(status: str, user_uuid: Optional[str] = None) -> None:
 
 
 def _validate_input(patient: PatientInput) -> None:
-    """Validate nghiem ngac theo Muc 3.2 trong REQUIREMENTS v1.1."""
+    """Validate nghiem ngac theo Muc 3.2 trong REQUIREMENTS v1.1 (Khong lo raw input)."""
     if not isinstance(patient, dict):
         raise TypeError("Input phai la kieu dictionary.")
 
@@ -132,7 +138,7 @@ def _eval_r01(patient: PatientInput) -> Optional[bool]:
 
     if di_nguyen is True:
         return False
-    
+
     if ho_hap is True or tuan_hoan is True:
         or_res: Optional[bool] = True
     elif ho_hap is False and tuan_hoan is False:
@@ -237,14 +243,13 @@ def _eval_soc(patient: PatientInput) -> Optional[bool]:
 
 def classify(patient: PatientInput) -> ClassificationResult:
     """Phân loại phản vệ theo đúng REQUIREMENTS v1.1."""
-    # 1. Validate Toàn bộ input trước. Nếu lỗi -> ghi audit INVALID_INPUT rồi raise TypeError/ValueError.
+    # 1. Validate toàn bộ input.
+    # SEC-08 & SEC-10: Nếu validation lỗi -> ghi audit INVALID_INPUT.
+    # Nếu audit cũng lỗi -> AuditError được tự động ưu tiên (không nuốt lỗi).
     try:
         _validate_input(patient)
     except (TypeError, ValueError) as err:
-        try:
-            _log_audit(status="INVALID_INPUT")
-        except AuditError:
-            pass
+        _log_audit(status="INVALID_INPUT")
         raise err
 
     # 2. Thiếu/null tuoi -> THEO_DOI (Ghi audit SUCCESS)
