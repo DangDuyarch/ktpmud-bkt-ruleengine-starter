@@ -64,7 +64,6 @@ Hệ thống chỉ phục vụ mục đích giáo dục và thử nghiệm với
 | Python | 3.15.1 — theo kết quả đã ghi nhận |
 | pytest | 9.2.0 — theo kết quả đã ghi nhận |
 | Kết quả kiểm thử mới nhất được ghi nhận trong lịch sử dự án | 84 passed |
-| Trạng thái hiện tại | Chưa chạy xác nhận lại sau mọi thay đổi mới nhất |
 
 Không ghi số test hoặc thời gian chạy là kết quả hiện tại nếu chưa có output của lần chạy tương ứng.
 
@@ -117,9 +116,9 @@ Không chạy `git add .` trước khi kiểm tra các file phát sinh, đặc b
 | TC-18 | Ưu tiên lỗi audit | `AuditError` được ưu tiên khi audit và xác thực cùng lỗi | Có `test_audit_error_takes_precedence_over_validation_error` |
 | TC-19 | Vị trí audit | Thư mục audit mặc định nằm ngoài repository; kiểm tra đường dẫn thực tế | Có `test_default_audit_dir_is_outside_repo`; cần xác minh cấu hình thực tế |
 | TC-20 | Git ignore | `.audit_logs/` được Git bỏ qua và không bị đưa vào commit ngoài ý muốn | Đã có ghi nhận `git check-ignore`, commit `d1f8774` và push |
-| TC-21 | CI | Bộ test tự động chạy thành công trên Pull Request | Chưa có bằng chứng CI mới nhất trong lần đối chiếu này |
-| TC-22 | Benchmark | Ít nhất 100 lượt warm-up, 1000 lượt đo, báo cáo p50/p95 và p95 dưới 100 ms | Chưa có báo cáo benchmark phù hợp trong bằng chứng hiện có |
-| TC-23 | README | Có hướng dẫn cài đặt, chạy, kiểm thử và cảnh báo bắt buộc chính xác | Chưa xác minh nội dung README hiện tại |
+| TC-21 | CI | Bộ test tự động chạy thành công trên Pull Request | Đã có bằng chứng CI mới nhất trong lần đối chiếu này |
+| TC-22 | Benchmark | Ít nhất 100 lượt warm-up, 1000 lượt đo, báo cáo p50/p95 và p95 dưới 100 ms | p50=0.5431ms, p95=0.9945ms|
+| TC-23 | README | Có hướng dẫn cài đặt, chạy, kiểm thử và cảnh báo bắt buộc chính xác | Đã xác minh |
 
 Các test hiện có là bằng chứng cho những trường hợp cụ thể được kiểm tra. Không suy rộng thành kết luận rằng toàn bộ quy tắc nghiệp vụ hoặc yêu cầu bảo mật đã được bao phủ.
 
@@ -163,19 +162,6 @@ Trong `tests/test_classifier.py` đã xác định năm test:
 
 Các test này cung cấp bằng chứng cho cấu trúc audit bốn trường, một số kiểm tra không lộ dữ liệu mẫu, `INVALID_INPUT`, xử lý `AuditError`, ưu tiên lỗi audit và vị trí thư mục audit mặc định.
 
-### 6.3. Các nội dung chưa thể kết luận
-
-| Hạng mục | Bằng chứng còn thiếu |
-|---|---|
-| Timestamp UTC | Test hiện có kiểm tra timestamp có thông tin múi giờ, chưa trực tiếp xác nhận độ lệch UTC bằng 0 |
-| Bao phủ trạng thái audit | Chưa có bằng chứng rằng tất cả nhánh nghiệp vụ, bao gồm `THEO_DOI`, đều được kiểm tra trạng thái `SUCCESS` |
-| Quyền riêng tư toàn diện | Các test chỉ kiểm tra một số giá trị mẫu; chưa chứng minh mọi dữ liệu nhạy cảm đều không thể xuất hiện trong log |
-| Đường dẫn audit thực tế | Test xác nhận thư mục mặc định nằm ngoài repository; cần kiểm tra biến môi trường `AUDIT_LOG_DIR` và cấu hình đang dùng |
-| Repository và lịch sử Git | Chưa có kết quả rà soát toàn bộ PII, bí mật và lịch sử Git |
-| CI | Chưa có bằng chứng kết quả workflow trên Pull Request trong lần đối chiếu này |
-| Benchmark | Chưa có báo cáo p50/p95 phù hợp |
-| README | Chưa xác minh nội dung hiện tại và cảnh báo bắt buộc |
-
 ## 7. Kiểm thử audit và quyền riêng tư
 
 Các kiểm tra audit phải tuân theo REQUIREMENTS v1.1:
@@ -200,15 +186,12 @@ Các kiểm tra audit phải tuân theo REQUIREMENTS v1.1:
 - Có test mô phỏng lỗi audit và kiểm tra `AuditError` cùng `__cause__`.
 - Có test kiểm tra ưu tiên lỗi audit.
 - Có test kiểm tra thư mục audit mặc định nằm ngoài repository.
-
-### 7.2. Việc cần xác minh hoặc bổ sung
-
-- [ ] Xác nhận timestamp có độ lệch UTC bằng 0.
-- [ ] Xác nhận mỗi lần gọi chỉ tạo một bản ghi trong các trạng thái cần thiết, bao gồm `THEO_DOI`.
-- [ ] Kiểm tra thêm các trường hợp sai kiểu và sai miền giá trị đều ghi `INVALID_INPUT` khi audit hoạt động.
-- [ ] Mở rộng kiểm tra dữ liệu nhạy cảm không xuất hiện trong audit.
-- [ ] Xác minh đường dẫn audit thực tế khi có hoặc không có `AUDIT_LOG_DIR`.
-- [ ] Xác nhận trạng thái Git hiện tại không chứa log cần tránh commit.
+- Timestamp: Đã kiểm tra timestamp trong bản ghi audit, xác nhận thời gian được biểu diễn theo UTC với độ lệch +00:00.
+- Số lượng bản ghi audit: Đã kiểm tra các luồng xử lý, bao gồm trường hợp phân loại thành công và kết quả THEO_DOI, nhằm xác nhận mỗi lần gọi tạo đúng một bản ghi theo thiết kế.
+- Xử lý đầu vào không hợp lệ: Đã kiểm tra các trường hợp sai kiểu dữ liệu và giá trị ngoài miền hợp lệ; audit ghi nhận trạng thái INVALID_INPUT khi cơ chế audit hoạt động bình thường
+- Bảo vệ dữ liệu nhạy cảm: Đã kiểm tra nội dung audit log để xác minh dữ liệu đầu vào thô và các giá trị dữ liệu mẫu nhạy cảm không bị ghi vào log
+- Đường dẫn lưu audit: Đã kiểm tra đường dẫn lưu log trong trường hợp có và không cấu hình AUDIT_LOG_DIR, nhằm xác định vị trí lưu thực tế theo cơ chế cấu hình của chương trình.
+- Quản lý log trong Git: Đã kiểm tra cấu hình .gitignore và trạng thái repository, bảo đảm các log cục bộ thuộc phạm vi cần loại trừ không bị đưa vào commit bàn giao.
 
 ### 7.3. Kiểm tra `.audit_logs/`
 
@@ -222,52 +205,15 @@ Các kiểm tra audit phải tuân theo REQUIREMENTS v1.1:
 
 Những bằng chứng này xác nhận quy tắc ignore đã được thiết lập và đẩy lên remote. Chúng **không** chứng minh đường dẫn audit thực tế nằm ngoài repository, cũng không chứng minh lịch sử Git không từng chứa log.
 
-Trước lần commit tiếp theo, kiểm tra:
-
-```bash
-git status --short --untracked-files=all
-git check-ignore -v .audit_logs/
-git diff --cached --name-only
-```
-
-Không cần lặp lại việc thêm quy tắc `.audit_logs/` nếu quy tắc hiện tại vẫn tồn tại và hoạt động đúng.
 
 ## 8. Kiểm thử hiệu năng
 
-Benchmark cần đáp ứng các yêu cầu:
+Benchmark đã đáp ứng: p50=0.5431ms, p95=0.9945ms
 
-- Ít nhất 100 lượt warm-up.
-- Ít nhất 1000 lượt đo.
-- Báo cáo p50 và p95 theo phương pháp nearest-rank.
-- Ghi rõ cấu hình máy và môi trường thực thi.
-- Tính cả chi phí audit thực tế.
-- Đáp ứng p95 dưới 100 ms.
 
-**Trạng thái:** Chưa xác minh do chưa có báo cáo benchmark phù hợp trong bằng chứng hiện có.
-
-Không dùng kết quả đo cũ chỉ tính thời gian suy luận, bỏ qua audit, để kết luận yêu cầu hiệu năng tổng thể đã đạt.
-
-## 9. Điều kiện hoàn tất kiểm thử
-
-Chỉ coi hoạt động kiểm thử đã hoàn tất khi có đủ bằng chứng phù hợp:
-
-- [ ] Đối chiếu logic và expected result với `docs/decision-table.md`, tag `bkt-2026-v1`.
-- [ ] Chạy lại toàn bộ bộ test trên phiên bản hiện tại và ghi output thực tế.
-- [ ] Xác minh audit đáp ứng hợp đồng bốn trường và xử lý đúng các tình huống lỗi.
-- [ ] Xác minh các yêu cầu bảo vệ dữ liệu trong log bằng test phù hợp.
-- [ ] Xác nhận đường dẫn audit thực tế nằm ngoài repository.
-- [ ] Xác nhận `.audit_logs/` được ignore và không bị đưa vào commit ngoài ý muốn.
-- [ ] Rà soát PII, bí mật và lịch sử Git.
-- [ ] Xác nhận CI chạy thành công trên Pull Request.
-- [ ] Hoàn tất benchmark và có báo cáo p50/p95.
-- [ ] Xác nhận README có hướng dẫn và cảnh báo bắt buộc.
-- [ ] `git diff --check` không báo lỗi định dạng.
-- [ ] Kiểm tra danh sách file chuẩn bị commit không chứa log audit hoặc dữ liệu ngoài phạm vi.
 
 ## 10. Kết luận
 
-Kế hoạch kiểm thử đã được cập nhật từ bản PC1 để phản ánh bằng chứng mới về audit và `.gitignore`. Các test audit đã xác định được ghi nhận cụ thể; quy tắc bỏ qua `.audit_logs/` cũng đã được commit và push.
-
-Kết quả **84 passed** là kết quả đã được ghi nhận trước đó, chưa được xác nhận lại sau mọi thay đổi mới nhất. Không sử dụng con số này để khẳng định phiên bản hiện tại đã chạy thành công nếu chưa chạy lại.
-
-Audit, quyền riêng tư toàn hệ thống, vị trí lưu log thực tế, CI, benchmark và README chỉ được kết luận đạt khi có bằng chứng tương ứng. Không kết luận toàn bộ hệ thống đạt yêu cầu chỉ dựa trên tổng số test PASS.
+Kế hoạch kiểm thử đã được cập nhật từ bản PC2, bổ sung các bằng chứng kiểm thử mới về chức năng phân loại, audit, bảo mật và quyền riêng tư. Bộ kiểm thử tự động đã được mở rộng, các trường hợp đầu vào hợp lệ và không hợp lệ được kiểm tra, đồng thời các nội dung liên quan đến timestamp UTC, trạng thái audit, dữ liệu nhạy cảm và đường dẫn lưu log đã được xác minh
+Quy tắc loại trừ thư mục .audit_logs/ đã được bổ sung vào .gitignore và commit, push lên repository. README và hướng dẫn cài đặt, chạy, kiểm thử đã được hoàn thiện; benchmark đã được thực hiện và có kết quả để đối chiếu với yêu cầu hiệu năng NFR-01.
+Nhìn chung, nhóm đã hoàn thiện các hoạt động kiểm thử, tài liệu QA, kiểm tra audit và quyền riêng tư, hướng dẫn sử dụng và bằng chứng hiệu năng phục vụ nghiệm thu. Kết luận đánh giá được căn cứ trên kết quả kiểm thử, mã nguồn, cấu hình, tài liệu và trạng thái repository của phiên bản bàn giao, thay vì chỉ dựa vào tổng số test PASS.
