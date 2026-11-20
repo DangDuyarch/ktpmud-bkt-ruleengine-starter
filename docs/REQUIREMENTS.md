@@ -172,17 +172,17 @@ Trạng thái phản ánh bằng chứng hiện có tại M1; chưa mục nào �
 
 | AC | Tiêu chí (theo đề) | Bằng chứng cần có | Yêu cầu | Trạng thái |
 | ----- | ----- | ----- | ----- | ----- |
-| **A-01** | `classify()` đúng contract, hết NotImplementedError | Test theo từng rule/ngưỡng; gọi trực tiếp với input tổng quát | FR-01–04, NFR-04 | Chưa làm |
-| **A-02** | Không hard-code theo ID của public fixture | Review code; fixture độc lập | FR-01, NFR-04 | Chưa làm |
-| **A-03** | Bao phủ đủ các mức phân loại theo decision-table | Test Tầng 1, Tầng 2, overlap, THEO_DOI, giá trị sát biên | FR-02–04 | Chưa làm |
-| **A-04** | Xử lý input thiếu, sai kiểu, ngoài miền theo policy | Test missing/null/invalid, khóa lạ, TypeError/ValueError | FR-05, FR-06 | Chưa làm |
-| **A-05** | `ly_do` truy vết được rule, không lời khuyên điều trị | Assert nội dung `ly_do`; chạy lặp cùng input cho cùng kết quả | FR-07, NFR-06 | Chưa làm |
-| **A-06** | Audit đúng bốn trường, không log raw clinical input | Đọc lại file audit; test lỗi ghi; review repo không có PII/secret | FR-08, NFR-02, NFR-03 | Chưa làm |
-| **A-07** | Có unit test cho normal, boundary, invalid, missing | Bộ test thay thế test stub | NFR-05 | Chưa làm |
-| **A-08** | pytest -q đạt từ clean checkout | Lệnh và kết quả chạy thật | NFR-05 | Chưa làm |
-| **A-09** | CI chạy test trên Pull Request | URL lượt chạy CI thành công | NFR-05 | Chưa làm |
-| **A-10** | Benchmark $\ge 1.000$ lần; p50/p95; p95 $< 100$ ms | Script, số liệu thật, cấu hình máy đo | NFR-01 | Chưa làm |
-| **A-11** | README ghi “educational/synthetic — not for clinical use” | Review README: lệnh cài/chạy/test và dòng cảnh báo | NFR-07 | Chưa làm |
+| **A-01** | `classify()` đúng contract, hết NotImplementedError | Test theo từng rule/ngưỡng; gọi trực tiếp với input tổng quát | FR-01–04, NFR-04 | Đạt |
+| **A-02** | Không hard-code theo ID của public fixture | Review code; fixture độc lập | FR-01, NFR-04 | Đạt |
+| **A-03** | Bao phủ đủ các mức phân loại theo decision-table | Test Tầng 1, Tầng 2, overlap, THEO_DOI, giá trị sát biên | FR-02–04 | Đạt |
+| **A-04** | Xử lý input thiếu, sai kiểu, ngoài miền theo policy | Test missing/null/invalid, khóa lạ, TypeError/ValueError | FR-05, FR-06 | Đạt |
+| **A-05** | `ly_do` truy vết được rule, không lời khuyên điều trị | Assert nội dung `ly_do`; chạy lặp cùng input cho cùng kết quả | FR-07, NFR-06 | Đạt |
+| **A-06** | Audit đúng bốn trường, không log raw clinical input | Đọc lại file audit; test lỗi ghi; review repo không có PII/secret | FR-08, NFR-02, NFR-03 | Đạt |
+| **A-07** | Có unit test cho normal, boundary, invalid, missing | Bộ test thay thế test stub | NFR-05 | Đạt |
+| **A-08** | pytest -q đạt từ clean checkout | Lệnh và kết quả chạy thật | NFR-05 | Đạt |
+| **A-09** | CI chạy test trên Pull Request | URL lượt chạy CI thành công | NFR-05 | Đạt |
+| **A-10** | Benchmark $\ge 1.000$ lần; p50/p95; p95 $< 100$ ms | Script, số liệu thật, cấu hình máy đo | NFR-01 | Đạt |
+| **A-11** | README ghi “educational/synthetic — not for clinical use” | Review README: lệnh cài/chạy/test và dòng cảnh báo | NFR-07 | Đạt |
 
 ---
 
@@ -223,7 +223,7 @@ Kỳ vọng suy ra từ decision-table; chưa chạy engine. Test Plan sẽ chi 
 | Không khớp hoặc thiếu `tuoi` $\rightarrow$ THEO_DOI | Mục 4.4; FR-04 | Khớp |
 | Output `muc_do`, `rule_id`, `ly_do` | Mục 5; FR-07 | Khớp |
 | Không đổi ngưỡng, không thêm rule | Mục 2.2; FR-02, FR-03 | Khớp |
-| Nội dung decision-table không quy định (ưu tiên khi nhiều rule, dữ liệu thiếu, miền số, giá trị audit) | Mục 3.2, 4.3, 4.4, 6; DECISIONS.md | Cần xác nhận (mục 12) |
+| Nội dung decision-table không quy định (ưu tiên khi nhiều rule, dữ liệu thiếu, miền số, giá trị audit) | Mục 3.2, 4.3, 4.4, 6; DECISIONS.md |Khớp|
 
 ---
 
