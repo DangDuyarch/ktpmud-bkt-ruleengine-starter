@@ -1,5 +1,6 @@
+# NHÓM 26: SLIDE
+- https://docs.google.com/presentation/d/11_dHq-RzoCugc5NalHWmvilyhEb8pLO12zfARVi3lt0/edit?slide=id.p4#slide=id.p4
 # KỊCH BẢN DEMO & THUYẾT TRÌNH (DEMO SCRIPT) — NHÓM 26
-
 - **Đề tài:** Track A — Dr May Day Rule Engine Sprint
 - **Thành viên Nhóm 26:** Nguyễn Hoàng Sơn, Đặng Văn Duy, Đoàn Bá Quý
 - **Thời lượng tối đa:** 07 phút (420 giây)
