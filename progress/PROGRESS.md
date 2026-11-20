@@ -114,7 +114,7 @@ Không có — nhóm không nhận được mục sửa đổi bắt buộc nào
 ---
 
 ## 3. Kết quả cuối — Freeze 19/11/2026
-- Tag: bkt-2026-<mã nhóm>-rc1 · SHA: 
-- Trạng thái cuối từng mã AC: (cập nhật bảng 2.2 hoặc ghi "như 2.2 trừ: …")
-- Những việc trong timeline chưa hoàn thành và lý do:
+- Tag: bkt-2026-nhom26-rc1 · SHA: f80b05cf00da1df4f997b9fdff4deee3ed767d6c  
+- Trạng thái cuối từng mã AC: Cập nhật cuối tại bảng 2, ktpmud-bkt-ruleengine-starter/docs/AC_TRACEABILITY.md   
+- Những việc trong timeline chưa hoàn thành và lý do: Đã hoàn thành đầy đủ các việc trong timeline.   
 
