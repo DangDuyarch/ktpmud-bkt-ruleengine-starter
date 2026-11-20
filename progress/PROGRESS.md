@@ -88,7 +88,7 @@ Không có — nhóm không nhận được mục sửa đổi bắt buộc nào
 | SECURITY_PRIVACY_CHECKLIST.md | Có | Track_A_Development/docs/SECURITY_PRIVACY_CHECKLIST.md |
 | AI_USE.md | Có | Track_A_Development/docs/ AI_USE.md |
 | CONTRIBUTIONS.md | Có | Track_A_Development/docs/ CONTRIBUTIONS.md |
-| Slide / demo script không quá 7 phút | Chưa | Cần xác nhận với nhóm và kiểm tra nội dung demo. |
+| Slide / demo script không quá 7 phút | Có | Track_A_Development/docs/ SLIDE_DEMOSCRIPT.md |
 | Draft PR vào ktpmud-project, check validate xanh | Có | https://github.com/fossbk-spec/ktpmud-project/pull/33 |
 
 ### 2.4. Việc còn lại đến Freeze — 23:59 ngày 19/11/2026
