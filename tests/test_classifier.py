@@ -244,4 +244,8 @@ def test_default_audit_dir_is_outside_repo(monkeypatch):
 
     repo_root = os.path.abspath(os.getcwd())
     default_dir = os.path.abspath(_get_default_audit_dir())
-    assert os.path.commonpath([repo_root, default_dir]) != repo_root
+try:
+        is_inside = os.path.commonpath([repo_root, default_dir]) == repo_root
+    except ValueError:
+        is_inside = False
+    assert not is_inside
