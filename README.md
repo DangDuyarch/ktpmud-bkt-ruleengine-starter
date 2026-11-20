@@ -1,32 +1,77 @@
 # BKT Rule Engine — Nhóm 26
-
 **Track A — Dr May Day: Rule Engine Sprint**
+
+> ⚠️ **Cảnh báo bắt buộc:** `educational/synthetic — not for clinical use.`  
+> Dự án phục vụ mục đích học tập và kiểm thử với dữ liệu tổng hợp, không dùng dữ liệu bệnh nhân thật và không cung cấp lời khuyên chẩn đoán hoặc điều trị.
 
 ---
 
-##  Tóm tắt sản phẩm
+## Tóm tắt sản phẩm
 
-Hệ thống xây dựng **Rule Engine** bằng **Python** cung cấp hàm `classify(patient)` để tiếp nhận dữ liệu synthetic, kiểm tra tính hợp lệ của đầu vào, áp dụng các quy tắc `R01-PV`, `R02-PV`, `R03-PV` và `R-SOC` theo **Decision Table V1**, sau đó trả về kết quả phân loại gồm `muc_do`, `rule_id` và `ly_do`. Hệ thống hỗ trợ xử lý dữ liệu thiếu, logic ba trạng thái và ghi audit trail theo đúng yêu cầu.
+Dự án thuộc Track A — Dr May Day: Rule Engine Sprint, xây dựng mô-đun Python thực hiện phân loại theo các quy tắc được quy định trong Decision Table.
 
->  **Cảnh báo bắt buộc:** `educational/synthetic — not for clinical use`.
+Hệ thống nhận dữ liệu đầu vào tổng hợp (synthetic data), kiểm tra tính hợp lệ của dữ liệu, áp dụng các quy tắc theo thứ tự ưu tiên và trả về kết quả phân loại cùng mã quy tắc và lý do tương ứng. Hệ thống cũng ghi audit log để hỗ trợ kiểm tra hoạt động và xử lý lỗi.
+
+* **Dự án:** KTPMUD Hack Marathon 2026
+* **Track:** Track A — Dr May Day Rule Engine Sprint
+* **Nguồn quy tắc nghiệp vụ:** `docs/decision-table.md`
+* **Phiên bản starter:** `bkt-2026-v1`
+* **Repository mã nguồn:** [`ktpmud-bkt-ruleengine-starter`](https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter)
 
 ---
 
 ## Hướng dẫn cài đặt, chạy và kiểm thử từ clean checkout
 
-### Yêu cầu hệ thống
-* **Git**, **Python** (gọi được bằng lệnh `python`), **pip**.
-* *(Đã kiểm thử thành công trên Windows, Python 3.15.1, pytest 9.2.0).*
+### 2.1. Yêu cầu
+* Python tương thích với dự án.
+* Git.
+* Các thư viện được khai báo trong `requirements.txt`.
 
-### Các bước thực hiện:
+### 2.2. Clone mã nguồn từ nhánh Track A
+Mở terminal và chạy:
 
 ```bash
-# 1. Clone repository
-git clone [https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git](https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git) 
-cd ktpmud-bkt-ruleengine-starter 
+git clone --branch Track_A_Development [https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git](https://github.com/DangDuyarch/ktpmud-bkt-ruleengine-starter.git)
+cd ktpmud-bkt-ruleengine-starter
+```
 
-# 2. Cài đặt các gói phụ thuộc
-python -m pip install -e .
+Lệnh trên tải mã nguồn trực tiếp từ nhánh Track_A_Development của repository nhóm.
 
-# 3. Chạy bộ kiểm thử (pytest)
+### 2.3. Cài đặt môi trường
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Git Bash/Linux:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+### 2.4. Chạy kiểm thử
+Từ thư mục gốc của repository:
+
+```bash
 python -m pytest -q
+```
+
+Để xem chi tiết từng test:
+
+```bash
+python -m pytest -v
+```
+
+> Kết quả được ghi nhận trong một lần chạy trước đó là 84 passed, 0 failed. Đây là kết quả lịch sử; cần chạy lại trên commit nộp bài để xác nhận trạng thái của phiên bản cuối cùng.
+
+---
+
+> Lưu ý: README này mô tả cách sử dụng và các tài liệu của dự án. Việc hoàn thành README không thay thế cho việc kiểm tra mã nguồn, chạy test, xác minh CI hoặc nghiệm thu của giảng viên/trợ giảng.
+
+`educational/synthetic — not for clinical use`  
+Slide/demo: https://docs.google.com/presentation/d/11_dHq-RzoCugc5NalHWmvilyhEb8pLO12zfARVi3lt0/edit?usp=sharing
